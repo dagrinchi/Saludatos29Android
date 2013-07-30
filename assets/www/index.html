@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+        
+        <link rel="stylesheet" href="css/normalize.css" />
+        <link rel="stylesheet" href="css/main.css" />
+        <link rel="stylesheet" href="css/saludatos.css" />
+        <link rel="stylesheet" href="css/jquery.mobile.structure-1.3.1.min.css" />
+        <title>Saludatos</title>
+    </head>
+    <body>
+        <!-- START PAGE INTRO -->
+        <!-- <div data-role="page" id="opening_page">
+            <div style="background-color: #fff; width:100%; height: 100%; position: relative; padding-bottom: 50%; padding-top: 30.5%;">
+                <iframe id="manual-animation-2" class="animation-size-for-iframe" src="motion_intro/motion.html" frameborder="0"></iframe>
+            </div>
+        </div> -->
+        <div id="intro" data-role="page" style="background-color: #fff !important;">
+            <div class="app">
+                <div class="title">Saludatos</div>
+                <div class="subtitle">Esta es una herramienta de acceso público y libre.</div>
+                     <br/>Ministerio de Salud <br/>y Protección Social<br/> 2013©
+                <p id="progressLabel" style="margin:0;"></p>
+                <div id="progressBar" class="pb"><div></div></div>
+                <div id="deviceready" class="blink">
+                    <p class="event listening">Conectando dispositivo</p>
+                    <p class="event received">Cargando aplicación</p>
+                </div>
+            </div>
+        </div>
+        <!-- START PAGE TUTORIAL -->
+        <div data-role="page" id="help_step1">    
+            <div class="tutorial" data-role="content"></div>
+            <div class="help_btns" data-role="controlgroup" data-type="horizontal">
+                <a href="#home" data-role="button" data-theme="b" data-icon="forward" data-iconpos="right">Omitir</a>
+                <a href="#help_step2" data-role="button" data-theme="b" data-icon="arrow-r" data-iconpos="right">Siguiente</a>            
+            </div>
+        </div>
+        <div data-role="page" id="help_step2">    
+            <div class="tutorial" data-role="content"></div>
+            <div class="help_btns" data-role="controlgroup" data-type="horizontal">
+                <a href="#home" data-role="button" data-theme="b" data-icon="forward" data-iconpos="right">Omitir</a>
+                <a href="#help_step3" data-role="button" data-theme="b" data-icon="arrow-r" data-iconpos="right">Siguiente</a>            
+            </div>
+        </div>
+        <div data-role="page" id="help_step3">    
+            <div class="tutorial" data-role="content"></div>
+            <div class="help_btns" data-role="controlgroup" data-type="horizontal">
+                <a href="#home" data-role="button" data-theme="b" data-icon="forward" data-iconpos="right">Omitir</a>
+                <a href="#help_step4" data-role="button" data-theme="b" data-icon="arrow-r" data-iconpos="right">Siguiente</a>            
+            </div>
+        </div>
+        <div data-role="page" id="help_step4">    
+            <div class="tutorial" data-role="content"></div>
+            <div class="help_btns" data-role="controlgroup" data-type="horizontal">
+                <a href="#home" data-role="button" data-theme="b" data-icon="forward" data-iconpos="right">Omitir</a>
+                <a href="#help_step5" data-role="button" data-theme="b" data-icon="arrow-r" data-iconpos="right">Siguiente</a>
+            </div>
+        </div>
+        <div data-role="page" id="help_step5">    
+            <div class="tutorial" data-role="content"></div>
+            <div class="help_btns" data-role="controlgroup" data-type="horizontal">
+                <a href="#home" data-role="button" data-theme="b" data-icon="check" data-iconpos="right" style="width: 100%;">Terminar</a>            
+            </div>
+        </div>
+        <!-- START PAGE HOME -->
+        <div data-role="page" id="home"> 
+            <div data-role="header" data-position="fixed">
+                <a href="#acerca" class="ui-btn-left" data-mini="true" data-icon="info" data-rel="dialog">Acerca</a>
+                <select id="options" class="ui-btn-right" data-mini="true" data-icon="gear" data-native-menu="false" data-iconpos="right">
+                    <option value="">Opciones</option>
+                    <option value="#help_step1">Ayuda</option>
+                    <option value="#updated">Última actualización</option>
+                </select>
+            </div>
+            <div data-role="content" class="ui-grid-a">
+                <div class="ui-block-a">
+                    <p>Número de Registros:</p>
+                    <span id="counter-reg">0</span>
+                    <p>Número de Departamentos:</p>
+                    <span id="counter-dep">0</span>
+                    <p>Número de Municipios:</p>
+                    <span id="counter-mun">0</span>
+                    <br />
+                    <a href="#popupDialog" data-rel="dialog" data-position-to="window" data-role="button" data-inline="true" data-transition="pop" data-icon="delete" data-theme="b">Restablecer</a>
+                </div>
+                <div class="ui-block-b sidebar">
+                    <a href="#cat" class="icon_health" data-rel="dialog">CATEGORÍAS<br/>DE SALUD<br/></a>
+                    <a href="#ubicaciones" class="icon_location" data-transition="slide">UBICACIÓN<br/>GEOGRÁFICA<br/></a>
+                    <a href="#demografia" class="icon_person" data-transition="slide">INFORMACIÓN<br/>DEMOGRÁFICA<br/></a>
+                </div>
+            </div>
+            <div data-role="footer" data-position="fixed">
+                <div class="ui-grid-d">
+                    <div class="ui-block-a">
+                        <a href="#pie" data-graph="pie" class="btn_secundario icon_cake"></a>
+                    </div>
+                    <div class="ui-block-b">
+                        <a href="#lineal" data-graph="lineal" class="btn_secundario icon_line"></a>
+                    </div>
+                    <div class="ui-block-c">
+                        <a href="#bars" data-graph="bars" class="btn_secundario icon_bars"></a>
+                    </div>
+                    <div class="ui-block-d">
+                        <a href="#maps" data-graph="maps" class="btn_secundario icon_map"></a>
+                    </div>
+                    <div class="ui-block-e">
+                        <a href="#table" data-graph="table" class="btn_secundario icon_num"></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END PAGE HOME -->
+        <!-- START DIALOG INDICADORES -->
+        <div data-role="dialog" id="cat" data-theme="b">
+            <div data-role="header" data-position="fixed" data-theme="b">
+                <h1>Categorías de Salud</h1>
+            </div>
+            <div data-role="content" data-theme="b">
+                <fieldset data-role="controlgroup" id="indList" data-theme="b"></fieldset>
+            </div>
+        </div>
+        <!-- END DIALOG INDICADORES -->
+        <!-- START PAGE UBICACIONES -->
+        <div data-role="page" id="ubicaciones" data-theme="c"> 
+            <div data-role="header" data-position="fixed" data-theme="c">
+                <a href="#home" class="ui-btn-left" data-icon="back">Volver</a>           
+                <h1>Ubicación Geográfica</h1>        
+            </div>
+            <div data-role="content">
+                <p>Seleccione una o varias ubicaciones para evaluar:</p>
+                <ul id="ubiList" data-role="listview" data-inset="true">           
+                    <li>
+                        <a id="regionBtn" href="#region" data-rel="dialog"><h1>Región</h1><span id="regionCount" class="ui-li-count"></span></a>
+                    </li>
+                    <li>
+                        <a id="subregionBtn" href="#subregion" data-rel="dialog"><h1>Subregión</h1><span id="subregionCount" class="ui-li-count"></span></a>
+                    </li>
+                    <li>
+                        <a id="departamentoBtn" href="#departamento" data-rel="dialog"><h1>Departamento</h1><span id="departamentoCount" class="ui-li-count"></span></a>
+                    </li>
+                    <li>
+                        <a id="municipioBtn" href="#municipio" data-rel="dialog"><h1>Municipio</h1><span id="municipioCount" class="ui-li-count"></span></a>
+                    </li>
+                    <li>
+                        <a id="zonaBtn" href="#zona" data-rel="dialog"><h1>Zona</h1><span id="zonaCount" class="ui-li-count"></span></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <!-- END PAGE UBICACIONES -->
+        <!-- START DIALOG REGIONES -->
+        <div data-role="dialog" id="region">
+            <div data-role="header" data-theme="c">
+                <h1>Región</h1>
+            </div>
+            <div data-role="content">
+                <fieldset data-role="controlgroup" id="regList"></fieldset>
+                <a href="#" data-role="button" data-icon="check" data-rel="back">Aceptar</a>
+            </div>
+        </div>
+        <!-- END DIALOG REGIONES -->
+        <!-- START DIALOG SUBREGIONES -->
+        <div data-role="dialog" id="subregion">
+            <div data-role="header" data-theme="c">
+                <h1>Subregión</h1>
+            </div>
+            <div data-role="content">
+                <fieldset data-role="controlgroup" id="subregList"></fieldset>
+                <a href="#" data-role="button" data-icon="check" data-rel="back">Aceptar</a>
+            </div>
+        </div>
+        <!-- END DIALOG SUBREGIONES -->
+        <!-- START DIALOG DEPARTAMENTO -->
+        <div data-role="dialog" id="departamento">
+            <div data-role="header" data-theme="c">
+                <h1>Departamento</h1>
+            </div>
+            <div data-role="content">
+                <fieldset data-role="controlgroup" id="depList"></fieldset>
+                <a href="#" data-role="button" data-icon="check" data-rel="back">Aceptar</a>
+            </div>
+        </div>
+        <!-- END DIALOG DEPARTAMENTO -->
+        <!-- START DIALOG MUNICIPIO -->
+        <div data-role="dialog" id="municipio">
+            <div data-role="header" data-theme="c">
+                <h1>Municipio</h1>
+            </div>
+            <div data-role="content">
+                <fieldset data-role="controlgroup" id="munList"></fieldset>
+                <a href="#" data-role="button" data-icon="check" data-rel="back">Aceptar</a>
+            </div>
+        </div>
+        <!-- END DIALOG MUNICIPIO -->
+        <!-- START DIALOG ZONA -->
+        <div data-role="dialog" id="zona">
+            <div data-role="header" data-theme="c">
+                <h1>Zona</h1>
+            </div>
+            <div data-role="content">
+                <fieldset data-role="controlgroup" id="zonList"></fieldset>
+                <a href="#" data-role="button" data-icon="check" data-rel="back">Aceptar</a>
+            </div>
+        </div>
+        <!-- END DIALOG ZONA -->
+        <!-- START PAGE DEMOGRAFÍA -->
+        <div data-role="page" id="demografia"> 
+            <div data-role="header" data-position="fixed" data-theme="d">
+                <a href="#home" class="ui-btn-left" data-icon="back">Volver</a>
+                <h1>Información Demográfica</h1>        
+            </div>
+            <div data-role="content">
+                <p>Seleccione una o varias clasificaciones demográficas para evaluar:</p>
+                <ul id="demList" data-role="listview" data-inset="true">           
+                    <li>
+                        <a id="educacionBtn" href="#educacion" data-rel="dialog"><h1>Educación</h1><span id="eduCount" class="ui-li-count"></span></a>
+                    </li>
+                    <li>
+                        <a id="ocupacionBtn" href="#ocupacion" data-rel="dialog"><h1>Ocupación</h1><span id="ocuCount" class="ui-li-count"></span></a>
+                    </li>
+                    <li>
+                        <a id="edadBtn" href="#edad" data-rel="dialog"><h1>Edad</h1><span id="edaCount" class="ui-li-count"></span></a>
+                    </li>
+                    <li>
+                        <a id="estadocivilBtn" href="#estadocivil" data-rel="dialog"><h1>Estado civil</h1><span id="estCount" class="ui-li-count"></span></a>
+                    </li>
+                    <li>
+                        <a id="generoBtn" href="#genero" data-rel="dialog"><h1>Género</h1><span id="genCount" class="ui-li-count"></span></a>
+                    </li>
+                    <li>
+                        <a id="etniaBtn" href="#etnia" data-rel="dialog"><h1>Etnia</h1><span id="etnCount" class="ui-li-count"></span></a>
+                    </li>
+                    <li>
+                        <a id="epsBtn" href="#eps" data-rel="dialog"><h1>EPS</h1><span id="epsCount" class="ui-li-count"></span></a>
+                    </li>
+                    <li>
+                        <a id="ipsBtn" href="#ips" data-rel="dialog"><h1>IPS</h1><span id="ipsCount" class="ui-li-count"></span></a>
+                    </li>
+                    <li>
+                        <a id="regimenBtn" href="#regimen" data-rel="dialog"><h1>Régimen</h1><span id="regiCount" class="ui-li-count"></span></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <!-- END PAGE DEMOGRAFÍA -->
+        <!-- START DIALOG EDUCACION -->
+        <div data-role="dialog" id="educacion">
+            <div data-role="header" data-theme="d">
+                <h1>Educación</h1>
+            </div>
+            <div data-role="content">
+                <fieldset data-role="controlgroup" id="eduList"></fieldset>
+                <a href="#" data-role="button" data-icon="check" data-rel="back">Aceptar</a>
+            </div>
+        </div>
+        <!-- END DIALOG EDUCACION -->
+        <!-- START DIALOG OCUPACION -->
+        <div data-role="dialog" id="ocupacion">
+            <div data-role="header" data-theme="d">
+                <h1>Ocupación</h1>
+            </div>
+            <div data-role="content">
+                <fieldset data-role="controlgroup" id="ocuList"></fieldset>
+                <a href="#" data-role="button" data-icon="check" data-rel="back">Aceptar</a>
+            </div>
+        </div>
+        <!-- END DIALOG OCUPACION -->
+        <!-- START DIALOG EDAD -->
+        <div data-role="dialog" id="edad">
+            <div data-role="header" data-theme="d">
+                <h1>Edad</h1>
+            </div>
+            <div data-role="content">
+                <fieldset data-role="controlgroup" id="edaList"></fieldset>
+                <a href="#" data-role="button" data-icon="check" data-rel="back">Aceptar</a>
+            </div>
+        </div>
+        <!-- END DIALOG EDAD -->
+        <!-- START DIALOG ESTADOCIVIL -->
+        <div data-role="dialog" id="estadocivil">
+            <div data-role="header" data-theme="d">
+                <h1>Estado civil</h1>
+            </div>
+            <div data-role="content">
+                <fieldset data-role="controlgroup" id="estList"></fieldset>
+                <a href="#" data-role="button" data-icon="check" data-rel="back">Aceptar</a>
+            </div>
+        </div>
+        <!-- END DIALOG ESTADOCIVIL -->
+        <!-- START DIALOG GENERO -->
+        <div data-role="dialog" id="genero">
+            <div data-role="header" data-theme="d">
+                <h1>Género</h1>
+            </div>
+            <div data-role="content">
+                <fieldset data-role="controlgroup" id="genList"></fieldset>
+                <a href="#" data-role="button" data-icon="check" data-rel="back">Aceptar</a>
+            </div>
+        </div>
+        <!-- END DIALOG GENERO -->
+        <!-- START DIALOG ETNIA -->
+        <div data-role="dialog" id="etnia">
+            <div data-role="header" data-theme="d">
+                <h1>Etnia</h1>
+            </div>
+            <div data-role="content">
+                <fieldset data-role="controlgroup" id="etnList"></fieldset>
+                <a href="#" data-role="button" data-icon="check" data-rel="back">Aceptar</a>
+            </div>
+        </div>
+        <!-- END DIALOG ETNIA -->
+        <!-- START DIALOG EPS -->
+        <div data-role="dialog" id="eps">
+            <div data-role="header" data-theme="d">
+                <h1>EPS</h1>
+            </div>
+            <div data-role="content">
+                <fieldset data-role="controlgroup" id="epsList"></fieldset>
+                <a href="#" data-role="button" data-icon="check" data-rel="back">Aceptar</a>
+            </div>
+        </div>
+        <!-- END DIALOG EPS -->
+        <!-- START DIALOG IPS -->
+        <div data-role="dialog" id="ips">
+            <div data-role="header" data-theme="d">
+                <h1>IPS</h1>
+            </div>
+            <div data-role="content">
+                <fieldset data-role="controlgroup" id="ipsList"></fieldset>
+                <a href="#" data-role="button" data-icon="check" data-rel="back">Aceptar</a>
+            </div>
+        </div>
+        <!-- END DIALOG IPS -->
+        <!-- START DIALOG REGIMEN -->
+        <div data-role="dialog" id="regimen">
+            <div data-role="header" data-theme="d">
+                <h1>Régimen</h1>
+            </div>
+            <div data-role="content">
+                <fieldset data-role="controlgroup" id="regimenList"></fieldset>
+                <a href="#" data-role="button" data-icon="check" data-rel="back">Aceptar</a>
+            </div>
+        </div>
+        <!-- END DIALOG REGIMEN -->
+        <!-- START PAGE PIE -->
+        <div data-role="page" id="pie"> 
+            <div data-role="header" data-position="fixed">
+                <a href="#home" class="ui-btn-left" data-icon="back">Volver</a>
+                <a href="#" class="ui-btn-right share" data-icon="arrow-d" data-chart="pie">Descargar</a>
+            </div>
+            <div data-role="content" class="chart-wrapper">
+                <div class="chart-inner">
+                    <p class="Title-Size"></p>
+                    <div id="piechartdiv" style="width: 100%; height: 100%;"></div>
+                </div>
+            </div>
+            <div data-role="footer" data-position="fixed">
+                <div class="pie-slider">
+                    <span id="pie-slider-label"></span>
+                    <input type="range" name="pie-slider" id="pie-slider" value="0" style="display: none;" />
+                </div>
+                <div class="ui-grid-d">
+                    <div class="ui-block-a">
+                        <a href="#pie" data-graph="pie" class="btn_secundario icon_cake"></a>
+                    </div>
+                    <div class="ui-block-b">
+                        <a href="#lineal" data-graph="lineal" class="btn_secundario icon_line"></a>
+                    </div>
+                    <div class="ui-block-c">
+                        <a href="#bars" data-graph="bars" class="btn_secundario icon_bars"></a>
+                    </div>
+                    <div class="ui-block-d">
+                        <a href="#maps" data-graph="maps" class="btn_secundario icon_map"></a>
+                    </div>
+                    <div class="ui-block-e">
+                        <a href="#table" data-graph="table" class="btn_secundario icon_num"></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END PAGE PIE -->
+        <!-- START PAGE LINEAL -->
+        <div data-role="page" id="lineal"> 
+            <div data-role="header" data-position="fixed">
+                <a href="#home" class="ui-btn-left" data-icon="back">Volver</a>
+                <a href="#" class="ui-btn-right share" data-icon="arrow-d" data-chart="lineal">Descargar</a>
+            </div>
+            <div data-role="content" class="chart-wrapper">
+                <div class="chart-inner">
+                    <div class="Title-Size"></div>
+                    <div id="linealchartdiv" style="width: 100%; height: 100%;"></div>
+                </div>
+            </div>    
+            <div data-role="footer" data-position="fixed">
+                <div class="ui-grid-d">
+                    <div class="ui-block-a">
+                        <a href="#pie" data-graph="pie" class="btn_secundario icon_cake"></a>
+                    </div>
+                    <div class="ui-block-b">
+                        <a href="#lineal" data-graph="lineal" class="btn_secundario icon_line"></a>
+                    </div>
+                    <div class="ui-block-c">
+                        <a href="#bars" data-graph="bars" class="btn_secundario icon_bars"></a>
+                    </div>
+                    <div class="ui-block-d">
+                        <a href="#maps" data-graph="maps" class="btn_secundario icon_map"></a>
+                    </div>
+                    <div class="ui-block-e">
+                        <a href="#table" data-graph="table" class="btn_secundario icon_num"></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END PAGE LINEAL -->
+        <!-- START PAGE BARS -->
+        <div data-role="page" id="bars"> 
+            <div data-role="header" data-position="fixed">
+                <a href="#home" class="ui-btn-left" data-icon="back">Volver</a>
+                <a href="#" class="ui-btn-right share" data-icon="arrow-d" data-chart="bars">Descargar</a>
+            </div>
+            <div data-role="content" class="chart-wrapper">
+                <div class="chart-inner">
+                    <p class="Title-Size"></p>
+                    <div id="columnchartdiv" style="width: 100%; height: 100%;"></div>
+                </div>
+            </div> 
+            <div data-role="footer" data-position="fixed">
+                <div class="ui-grid-d">
+                    <div class="ui-block-a">
+                        <a href="#pie" data-graph="pie" class="btn_secundario icon_cake"></a>
+                    </div>
+                    <div class="ui-block-b">
+                        <a href="#lineal" data-graph="lineal" class="btn_secundario icon_line"></a>
+                    </div>
+                    <div class="ui-block-c">
+                        <a href="#bars" data-graph="bars" class="btn_secundario icon_bars"></a>
+                    </div>
+                    <div class="ui-block-d">
+                        <a href="#maps" data-graph="maps" class="btn_secundario icon_map"></a>
+                    </div>
+                    <div class="ui-block-e">
+                        <a href="#table" data-graph="table" class="btn_secundario icon_num"></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END PAGE BARS -->
+        <!-- START PAGE MAP -->
+        <div data-role="page" id="maps"> 
+            <div data-role="header" data-position="fixed">
+                <a href="#home" class="ui-btn-left" data-icon="back">Volver</a>
+                <a href="#" class="ui-btn-right share" data-icon="arrow-d" data-chart="map">Descargar</a>
+            </div>
+            <div data-role="content" class="chart-wrapper">
+                <div class="chart-inner">
+                    <p class="Title-Size"></p>
+                    <div id="geochartdiv" style="width: 100%; height: 100%;"></div>
+                </div>
+            </div> 
+            <div data-role="footer" data-position="fixed">
+                <div class="maps-slider">
+                    <span id="maps-slider-label"></span>
+                    <input type="range" name="maps-slider" id="maps-slider" value="0" style="display: none;" />
+                </div>
+                <div class="ui-grid-d">
+                    <div class="ui-block-a">
+                        <a href="#pie" data-graph="pie" class="btn_secundario icon_cake"></a>
+                    </div>
+                    <div class="ui-block-b">
+                        <a href="#lineal" data-graph="lineal" class="btn_secundario icon_line"></a>
+                    </div>
+                    <div class="ui-block-c">
+                        <a href="#bars" data-graph="bars" class="btn_secundario icon_bars"></a>
+                    </div>
+                    <div class="ui-block-d">
+                        <a href="#maps" data-graph="maps" class="btn_secundario icon_map"></a>
+                    </div>
+                    <div class="ui-block-e">
+                        <a href="#table" data-graph="table" class="btn_secundario icon_num"></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END PAGE MAP -->
+        <!-- START PAGE TABLE -->
+        <div data-role="page" id="table"> 
+            <div data-role="header" data-position="fixed">
+                <a href="#home" class="ui-btn-left" data-icon="back">Volver</a>
+                <a href="#" class="ui-btn-right share" data-icon="arrow-d" data-chart="table">Descargar</a>
+            </div>
+            <div data-role="content">
+                <table cellpadding="0" cellspacing="0" border="0" id="dtable" class="ui-responsive table-stroke"></table>
+            </div> 
+            <div data-role="footer" data-position="fixed">
+                <div class="ui-grid-d">
+                    <div class="ui-block-a">
+                        <a href="#pie" data-graph="pie" class="btn_secundario icon_cake"></a>
+                    </div>
+                    <div class="ui-block-b">
+                        <a href="#lineal" data-graph="lineal" class="btn_secundario icon_line"></a>
+                    </div>
+                    <div class="ui-block-c">
+                        <a href="#bars" data-graph="bars" class="btn_secundario icon_bars"></a>
+                    </div>
+                    <div class="ui-block-d">
+                        <a href="#maps" data-graph="maps" class="btn_secundario icon_map"></a>
+                    </div>
+                    <div class="ui-block-e">
+                        <a href="#table" data-graph="table" class="btn_secundario icon_num"></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END PAGE TABLE -->
+        <!-- START DIALOG ACERCA DE -->
+        <div data-role="dialog" id="acerca">
+            <div data-role="header" data-position="fixed">
+                <h1>Acerca de...</h1>
+            </div>
+            <div data-role="content">
+                <h1>Saludatos <span style="color: #AAA; font-size: 0.5em;">v1.0</span></h1>
+                <p>Ministerio de Salud y Protección Social</p>
+                <p>&copy;2013 - Derechos reservados</p>
+                <p>Tenga en cuenta que esta aplicación requiere acceso a internet y puede consumir recursos de su plan de datos.</p>
+                <div class="ui-grid-a">
+                    <div class="ui-block-a">
+                        <img src="img/logo-minSalud.png" alt="Ministerio de Salud y Protección Social" style="width: 95%" />
+                    </div>
+                    <div class="ui-block-b">
+                        <img src="img/mintic.png" alt="Ministerio de Tecnologías de la Información y Comunicaciones" style="width: 100%" />
+                    </div>
+                </div>
+                <p>Paola Vanegas, Alejandro Zarate, Marcos Aguilera y David Alméciga</p>
+                <p>COOL<b>4CODE</b>.com</p>
+            </div>
+        </div>
+        <!-- END DIALOG ACERCA DE -->
+        <div data-role="dialog" id="popupDialog" data-overlay-theme="a" data-theme="c" data-dismissible="false">
+            <div data-role="header" data-theme="a" class="ui-corner-top">
+                <h1>¿Restablecer?</h1>
+            </div>
+            <div data-role="content" data-theme="d" class="ui-corner-bottom ui-content">
+                <h3 class="ui-title">¿Desea continuar?</h3>
+                <p>Esta acción restablece las gráficas y contadores a las consultas iniciales.</p>
+                <a href="#" data-role="button" data-inline="true" data-rel="back" data-theme="c">Cancelar</a>
+                <a href="#home" id="reset" data-role="button" data-inline="true" data-transition="flow" data-theme="b">Aceptar</a>
+            </div>
+        </div>
+        <div data-role="dialog" id="updated" data-overlay-theme="a" data-theme="c" data-dismissible="false">
+            <div data-role="header" data-theme="a" class="ui-corner-top">
+                <h1>Última fecha de actualización</h1>
+            </div>
+            <div data-role="content" data-theme="d" class="ui-corner-bottom ui-content">
+                <h3 class="ui-title">¿Desea continuar?</h3>
+                <p>Última fecha de actualización:</p>
+                <p id="date"></p>
+                <p>Frecuencia de actualización:</p>
+                <p><strong>6 meses</strong></p>
+                <p>Esta acción restablece las bases de datos descargando la información nuevamente a su dispositivo, tenga presente que requiere de una conexión a internet.</p>
+                <a href="#" data-role="button" data-inline="true" data-rel="back" data-theme="c">Cancelar</a>
+                <a href="#intro" id="update" data-role="button" data-inline="true" data-transition="flow" data-theme="b">Actualizar</a>
+            </div>
+        </div>
+        <canvas id="canvas" style="display: none;"></canvas> 
+        <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="js/jquery-1.9.1.min.js"></script>
+        <script type="text/javascript" src="js/jquery.mobile-1.3.1.min.js"></script>
+        <script type="text/javascript" src="js/highcharts.js"></script>
+        <script type="text/javascript" src="js/themes/gray.js"></script>
+        <script type="text/javascript" src="js/jquery.dataTables.min.js"></script>
+        <script type="text/javascript" src="js/canvg/rgbcolor.js"></script>
+        <script type="text/javascript" src="js/canvg/StackBlur.js"></script>
+        <script type="text/javascript" src="js/canvg/canvg.js"></script>
+        <script type="text/javascript" src="js/canvas-to-blob.min.js"></script>
+        <script type="text/javascript" src="js/Canvas2ImagePlugin.js"></script>
+        <script type="text/javascript" src="js/index.js"></script>
+        <script type="text/javascript">
+            app.initialize();
+        </script>
+    </body>
+</html>

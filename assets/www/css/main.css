@@ -1,0 +1,411 @@
+
+* {
+    -webkit-tap-highlight-color: rgba(0,0,0,0); /* make transparent link selection, adjust last value opacity 0 to 1.0 */
+}
+
+html, body {
+    height : 100%;
+    font-weight: 300 !important; 
+}
+/*=========================================BEGIN ANDROID DEVICESS ===================================*/
+
+body {
+    -webkit-touch-callout: none;                /* prevent callout to copy image, etc when tap to hold */
+    -webkit-text-size-adjust: none;             /* prevent webkit from resizing text to fit */
+    -webkit-user-select: none;                  /* prevent copy paste, to allow, change 'none' to 'text' */
+    background-color: #fff;				
+    background-attachment:fixed;
+    font-family: 'Open Sans', sans-serif;
+    height:100%;
+    margin:0px;
+    padding:0px;
+    text-transform: none;
+    width:100%;
+}
+
+/* Portrait layout (default) */
+.app {
+    background:url(../img/minsalud.png) no-repeat center top; /* 170px x 200px */
+    position:absolute;             /* position in the center of the screen */
+    left:50%;
+    top:50%;
+    height:50px;                   /* text area height */
+    width:250px;                   /* text area width */
+    /*background-position: 50% 50%;*/
+    /*background-size: 100%;*/      /*it works good but, expand the image some bad */
+    /*http://stackoverflow.com/questions/6028737/resize-background-image-in-div-using-css*/            
+    background-size: contain;
+    text-align:center;
+    padding:90px 0px 0px 0px;     /* image height is 200px (bottom 20px are overlapped with text) */
+    margin:-115px 0px 0px -112px;  /* offset vertical: half of image height and text area height */
+                                   /* offset horizontal: half of text area width */
+}
+
+/* Landscape layout (with min-width) */
+@media screen and (min-aspect-ratio: 1/1) and (min-width:400px) {
+    .app {
+        background-position:left center;
+        padding:100px 0px 0px 0px;   /* padding-top + padding-bottom + text area = image height */
+        margin:-98px 0px 0px -98px;  /* offset vertical: half of image height */
+                                     /* offset horizontal: half of image width and text area width */
+    }
+}
+
+.title{
+    font-size: 50px;
+    margin:0px;
+    overflow:visible;
+    padding:0px;
+    text-align:center;
+    letter-spacing:-3px;
+}
+
+.subtitle{
+   font-size: 15px;
+   margin:0px;
+   overflow:visible;
+   padding:0px;
+   text-align:center; 
+   letter-spacing: -1px;
+}
+
+.event {
+    border-radius:4px;
+    -webkit-border-radius:4px;
+    color:#FFFFFF;
+    font-size:12px;
+    margin:0px 30px;
+    padding:2px 0px;
+}
+
+.event.listening {
+    background-color:#333333;
+    display:block;
+}
+
+.event.received {
+    background-color:#4B946A;
+    display:none;
+}
+
+@keyframes fade {
+    from { opacity: 1.0; }
+    50% { opacity: 0.4; }
+    to { opacity: 1.0; }
+}
+ 
+@-webkit-keyframes fade {
+    from { opacity: 1.0; }
+    50% { opacity: 0.4; }
+    to { opacity: 1.0; }
+}
+ 
+.blink {
+    animation:fade 3000ms infinite;
+    -webkit-animation:fade 3000ms infinite;
+}
+
+/*========================================== END ANDROID DEVICES ====================================*/
+
+/*****Start Media screen types******/
+/*iPhone < 5:*/
+@media screen and (device-aspect-ratio: 2/3) {
+	.animation-size-for-iframe {
+		width: 330px;
+		height: 355px;
+		margin: 0px 60% 0px 0px !important;
+	}
+}
+/*iPhone 5:*/
+@media screen and (device-aspect-ratio: 40/71) {
+	.animation-size-for-iframe {
+	width: 330px;
+	height: 355px;
+	margin: 0px 60% 0px 0px !important;
+	}
+}
+/*iPad:*/
+@media screen and (device-aspect-ratio: 3/4) {
+	.animation-size-for-iframe {
+	width: 330px;
+	height: 355px;
+	margin: 0px 33.3% 0px 28.3% !important;
+	}
+}
+/* Smartphones (portrait and landscape) ———– */
+/*@media only screen and (min-width : 320px) and (max-width : 480px) {
+/* Styles 
+
+}*/
+/* Smartphones (landscape) ———– */
+/*@media only screen and (min-width : 321px) {
+/* Styles 
+}*/
+/* Smartphones (portrait) ———– */
+/*@media only screen and (max-width : 320px) {
+/* Styles 
+}*/
+/* iPads (portrait and landscape) ———– */
+/*@media only screen and (min-width : 768px) and (max-width : 1024px) {
+/* Styles 
+	.animation-size-for-iframe {
+	width: 330px;
+	height: 355px;
+	margin: 0px 33.3% 0px 28.3% !important;
+	}
+}*/
+/* iPads (landscape) ———– */
+/*@media only screen and (min-width : 768px) and (max-width : 1024px) and (orientation : landscape) {
+ Styles 
+	/*.animation-size-for-iframe {
+	width: 330px;
+	height: 355px;
+	margin: 0px 33.3% 0px 23.3% !important;
+	}
+}*/
+/* iPads (portrait) ———– */
+/*@media only screen and (min-width : 768px) and (max-width : 1024px) and (orientation : portrait) {
+/* Styles */
+   /*.animation-size-for-iframe {
+	width: 330px;
+	height: 355px;
+	margin: 0px 33.3% 0px 23.3% !important;
+	}
+}*/
+/* Desktops and laptops ———– */
+/*@media only screen and (min-width : 1224px) {*/
+/* Styles 
+
+}
+/* Large screens ———– */
+/*@media only screen and (min-width : 1824px) {
+/* Styles 
+
+}*/
+/* iPhone 4 ———– */
+/*@media only screen and (-webkit-min-device-pixel-ratio : 1.5), only screen and (min-device-pixel-ratio : 1.5) {
+ Styles 
+	/*.animation-size-for-iframe {
+	width: 330px;
+	height: 355px;
+	margin: 0px 33.3% 0px 23.3% !important;
+	} 
+}*/
+/*****End Media screen types******/
+
+/*Tutorial screen*/
+#help_step1 > div{
+	background:url(../img/manual.jpg) no-repeat top center fixed; /* 170px x 200px */ 
+}
+
+#help_step2 > div{
+	background:url(../img/tutoriales/tuto_categorias.jpg) no-repeat top center fixed; /* 170px x 200px */ 
+}
+
+#help_step3 > div{
+	background:url(../img/tutoriales/tuto_geografica.jpg) no-repeat top center fixed; /* 170px x 200px */ 
+}
+
+#help_step4 > div{
+	background:url(../img/tutoriales/tuto_demografica.jpg) no-repeat top center fixed; /* 170px x 200px */ 
+}
+
+#help_step5 > div{
+	background:url(../img/tutoriales/tuto_pie.jpg) no-repeat top center fixed; /* 170px x 200px */ 
+}
+
+.tutorial {      
+    -webkit-background-size: 90%;
+    -moz-background-size: 90%;
+    -o-background-size: 90%;  
+    background-size: 90%;
+    min-width: 100%;
+    min-height: 100%;
+    width: 100%;
+    height: auto;
+    margin: 0 auto;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 0 !important;
+}
+
+.help_btns{
+	position: absolute;
+	bottom: 20px;
+	left: 50%;
+	width: 255px;
+	margin-left: -128px !important;
+}
+
+.help_btns > div {
+	width: 255px;
+
+}
+
+.help_btns a{
+	background: #29abe2 !important;
+}
+
+/* Reponsive chart */
+.chart-wrapper {
+	position: relative;
+    padding-bottom: 20%;
+    background-color: none;
+    padding-top: 40px;
+}
+
+.chart-inner {
+	/*position: absolute;*/
+    width: 100%; 
+    height: 100%;
+}
+
+.Title-Size{
+	text-align: center;
+	display: block;
+	margin-bottom: 0;
+}
+
+iframe {
+	border-width: 0;
+}
+
+fieldset label {
+	text-transform: uppercase;
+}
+
+.icon_cake {
+	background: url('images/Ponque.png') no-repeat center;
+	background-size: 38px 38px;
+	background-repeat:no-repeat;
+}
+
+.icon_line {
+	background: url('images/Lineal.png') no-repeat center;
+	background-size: 38px 38px;
+	background-repeat:no-repeat;
+}
+
+.icon_bars {
+	background: url('images/Barras.png') no-repeat center;
+	background-size: 38px 38px;
+	background-repeat:no-repeat;
+}
+
+.icon_map {
+	background: url('images/Mapa.png') no-repeat center;
+	background-size: 38px 38px;
+	background-repeat:no-repeat;
+}
+
+.icon_num {
+	background: url('images/Numero.png') no-repeat center;
+	background-size: 38px 38px;
+	background-repeat:no-repeat;
+}
+
+.btn_secundario {
+	display: block;
+	width: 100%;
+	height: 60px;
+}
+
+#home .ui-content {
+	padding: 5px;
+}
+
+.sidebar {
+	width: 35% !important;
+  	max-width: 200px;
+  	float: right !important;
+}
+
+.sidebar a {
+	text-shadow: none !important;
+	/*font-size: 80%;*/
+	font-size: 80%;
+	text-decoration: none;
+	color: #fff !important;
+	display: block;
+	text-align: center;
+	padding-top: 10%;
+	margin: 4% 0;
+	overflow: hidden;
+	font-weight: bold !important;
+	text-shadow: 0px 0px 6px #949494;
+	letter-spacing: -1px;
+	font-family: "Helvetica Neue";
+}
+
+.icon_health {
+	background: url('images/health_end.png') #29abe2 no-repeat center 70%;
+	background-size: 40%;
+}
+
+.icon_location {
+	background: url('images/location_end.png') #ed1e79 no-repeat center 70%;	
+	background-size: 40%;
+}
+
+.icon_person {
+	/*background: url('images/person_end.png') #FFCC11 no-repeat center 70%;*/ /*no eliminar linea*/
+	background: url('images/person_end.png') #FFC125 no-repeat center 70%;
+	background-size: 40%;
+}
+
+#home .ui-content p {
+	margin: 0;
+	padding: 0;
+}
+
+#counter-reg, #counter-dep, #counter-mun {
+	font-size: 350%;
+	color: #ccc;
+}
+
+#pie .ui-content, #lineal .ui-content, #bars .ui-content, #maps .ui-content, #table .ui-content {
+	padding: 40px 0 70px 0;
+}
+
+#pie-slider-label, #maps-slider-label {
+	font-size: 1em;
+	display: block;
+	position: absolute;
+	margin: 4px 0px 0px 10px;
+}
+
+#progressBar {
+	margin: 5px auto;
+	width: 200px;
+	height: 22px;
+}
+
+#progressBar div {
+	height: 100%;
+	color: #fff;
+	text-align: right;
+	font-size: 12px;
+	line-height: 22px;
+	width: 0;
+}
+
+.pb {
+	background: #000;
+	border: 1px solid #111;	
+	border-radius: 5px;	
+	overflow: hidden;
+	box-shadow: 0 0 5px #333;
+}
+.pb div {
+	background-color: #1a82f7;
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#0099FF), to(#1a82f7)); 
+	background: -webkit-linear-gradient(top, #0099FF, #1a82f7); 
+	background: -moz-linear-gradient(top, #0099FF, #1a82f7); 
+	background: -ms-linear-gradient(top, #0099FF, #1a82f7); 
+	background: -o-linear-gradient(top, #0099FF, #1a82f7);
+}
+
+div[data-role="header"] {
+	height: 42px !important;
+}
