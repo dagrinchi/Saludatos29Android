@@ -178,7 +178,12 @@ receivedEvent: function(id) {
       setTimeout(function() {
         switch (device.platform) {
           case "Android":
-            app.createFile(chartType + "-" + filedate + ".png", canvasObj.toDataURL());
+            //app.createFile(chartType + "-" + filedate + ".png", canvasObj.toDataURL());
+			window.savephotoplugin(canvasObj,"image/jpeg",device.version,function(val){ 
+				navigator.notification.alert(val, function() {
+                  app.hideLoadingBox();
+                }, 'Atención', 'Aceptar');
+			});
             break;
           case "iOS":
             var canvas2ImagePlugin = window.plugins.canvas2ImagePlugin;

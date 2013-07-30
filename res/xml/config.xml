@@ -18,17 +18,13 @@
  under the License.
 -->
 <widget xmlns     = "http://www.w3.org/ns/widgets"
-        id        = "io.cordova.helloCordova"
-        version   = "2.0.0">
-    <name>Hello Cordova</name>
+        id        = "com.cool4code.saludatos"
+        version   = "1.0.0">
+    <name>Saludatos</name>
 
-    <description>
-        A sample Apache Cordova application that responds to the deviceready event.
-    </description>
+    <description>Saludatos es una herramienta de acceso publico y libre. Ministerio de Salud y Proteccion Social 2013</description>
 
-    <author href="http://cordova.io" email="dev@cordova.apache.org">
-        Apache Cordova Team
-    </author>
+    <author href="http://www.cool4code.com" email="info@cool4code.com">COOL4CODE</author>
 
     <access origin="*"/>
 
@@ -103,5 +99,6 @@
     </feature>
     <!-- Deprecated plugins element. Remove in 3.0 -->
     <plugins>
-    </plugins>
+    	<plugin name="SavePhotoPlugin" value="com.cool4code.saludatos.plugin.SavePhotoPlugin"/>
+	</plugins>
 </widget>
