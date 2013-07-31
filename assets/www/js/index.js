@@ -179,11 +179,20 @@ receivedEvent: function(id) {
         switch (device.platform) {
           case "Android":
             //app.createFile(chartType + "-" + filedate + ".png", canvasObj.toDataURL());
-			window.savephotoplugin(canvasObj,"image/jpeg",device.version,function(val){ 
-				navigator.notification.alert(val, function() {
+            var SavePhotoPlugin = window.plugins.SavePhotoPlugin;
+			SavePhotoPlugin.saveImageDataToLibrary(
+              function(msg) {
+                navigator.notification.alert('Imagen guardada en tus fotos!', function() {
                   app.hideLoadingBox();
                 }, 'Atención', 'Aceptar');
-			});
+              },
+              function(err) {
+                navigator.notification.alert('No se pudo descargar la imagen!', function() {
+                  app.hideLoadingBox();
+                }, 'Atención', 'Aceptar');
+              },
+              'canvas'
+            );
             break;
           case "iOS":
             var canvas2ImagePlugin = window.plugins.canvas2ImagePlugin;
