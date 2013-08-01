@@ -99,6 +99,6 @@
     </feature>
     <!-- Deprecated plugins element. Remove in 3.0 -->
     <plugins>
-    	<plugin name="SavePhotoPlugin" value="com.cool4code.saludatos.plugin.SavePhotoPlugin"/>
+    	<plugin name="Social" value="com.cool4code.saludatos.plugin.Social"/>
 	</plugins>
 </widget>

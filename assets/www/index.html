@@ -132,6 +132,9 @@
             <div data-role="content">
                 <p>Seleccione una o varias ubicaciones para evaluar:</p>
                 <ul id="ubiList" data-role="listview" data-inset="true">           
+                	<li>
+                        <a id="paisBtn" href="#pais" data-rel="dialog"><h1>País</h1><span id="paisCount" class="ui-li-count"></span></a>
+                    </li>
                     <li>
                         <a id="regionBtn" href="#region" data-rel="dialog"><h1>Región</h1><span id="regionCount" class="ui-li-count"></span></a>
                     </li>
@@ -151,6 +154,17 @@
             </div>
         </div>
         <!-- END PAGE UBICACIONES -->
+        <!-- START DIALOG PAIS -->
+        <div data-role="dialog" id="pais">
+            <div data-role="header" data-theme="c">
+                <h1>País</h1>
+            </div>
+            <div data-role="content">
+                <fieldset data-role="controlgroup" id="paisList"></fieldset>
+                <a href="#" data-role="button" data-icon="check" data-rel="back">Aceptar</a>
+            </div>
+        </div>
+        <!-- END DIALOG PAIS -->
         <!-- START DIALOG REGIONES -->
         <div data-role="dialog" id="region">
             <div data-role="header" data-theme="c">
@@ -349,7 +363,7 @@
         <div data-role="page" id="pie"> 
             <div data-role="header" data-position="fixed">
                 <a href="#home" class="ui-btn-left" data-icon="back">Volver</a>
-                <a href="#" class="ui-btn-right share" data-icon="arrow-d" data-chart="pie">Descargar</a>
+                <a href="#" class="ui-btn-right share" data-icon="arrow-d" data-chart="pie">Compartir</a>
             </div>
             <div data-role="content" class="chart-wrapper">
                 <div class="chart-inner">
@@ -386,7 +400,7 @@
         <div data-role="page" id="lineal"> 
             <div data-role="header" data-position="fixed">
                 <a href="#home" class="ui-btn-left" data-icon="back">Volver</a>
-                <a href="#" class="ui-btn-right share" data-icon="arrow-d" data-chart="lineal">Descargar</a>
+                <a href="#" class="ui-btn-right share" data-icon="arrow-d" data-chart="lineal">Compartir</a>
             </div>
             <div data-role="content" class="chart-wrapper">
                 <div class="chart-inner">
@@ -419,7 +433,7 @@
         <div data-role="page" id="bars"> 
             <div data-role="header" data-position="fixed">
                 <a href="#home" class="ui-btn-left" data-icon="back">Volver</a>
-                <a href="#" class="ui-btn-right share" data-icon="arrow-d" data-chart="bars">Descargar</a>
+                <a href="#" class="ui-btn-right share" data-icon="arrow-d" data-chart="bars">Compartir</a>
             </div>
             <div data-role="content" class="chart-wrapper">
                 <div class="chart-inner">
@@ -452,7 +466,6 @@
         <div data-role="page" id="maps"> 
             <div data-role="header" data-position="fixed">
                 <a href="#home" class="ui-btn-left" data-icon="back">Volver</a>
-                <a href="#" class="ui-btn-right share" data-icon="arrow-d" data-chart="map">Descargar</a>
             </div>
             <div data-role="content" class="chart-wrapper">
                 <div class="chart-inner">
@@ -489,7 +502,6 @@
         <div data-role="page" id="table"> 
             <div data-role="header" data-position="fixed">
                 <a href="#home" class="ui-btn-left" data-icon="back">Volver</a>
-                <a href="#" class="ui-btn-right share" data-icon="arrow-d" data-chart="table">Descargar</a>
             </div>
             <div data-role="content">
                 <table cellpadding="0" cellspacing="0" border="0" id="dtable" class="ui-responsive table-stroke"></table>
@@ -574,9 +586,7 @@
         <script type="text/javascript" src="js/canvg/rgbcolor.js"></script>
         <script type="text/javascript" src="js/canvg/StackBlur.js"></script>
         <script type="text/javascript" src="js/canvg/canvg.js"></script>
-        <script type="text/javascript" src="js/canvas-to-blob.min.js"></script>
-        <script type="text/javascript" src="js/Canvas2ImagePlugin.js"></script>
-        <script type="text/javascript" src="js/SavePhotoPlugin.js"></script>
+        <script type="text/javascript" src="js/social.js"></script>
         <script type="text/javascript" src="js/index.js"></script>
         <script type="text/javascript">
             app.initialize();
