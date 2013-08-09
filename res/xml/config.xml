@@ -20,9 +20,9 @@
 <widget xmlns     = "http://www.w3.org/ns/widgets"
         id        = "com.cool4code.saludatos"
         version   = "1.0.0">
-    <name>Saludatos</name>
+    <name>SaluDatos</name>
 
-    <description>Saludatos es una herramienta de acceso publico y libre. Ministerio de Salud y Proteccion Social 2013</description>
+    <description>SaluDatos es una herramienta de acceso publico y libre. Ministerio de Salud y Proteccion Social 2013</description>
 
     <author href="http://www.cool4code.com" email="info@cool4code.com">COOL4CODE</author>
 
