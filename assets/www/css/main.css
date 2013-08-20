@@ -15,7 +15,7 @@ body {
     -webkit-user-select: none;                  /* prevent copy paste, to allow, change 'none' to 'text' */
     background-color: #fff;				
     background-attachment:fixed;
-    font-family: 'Open Sans', sans-serif;
+/*     font-family: 'Open Sans', sans-serif; */
     height:100%;
     margin:0px;
     padding:0px;
@@ -195,7 +195,7 @@ body {
 
 /*Tutorial screen*/
 #help_step1 > div{
-	background:url(../img/manual.jpg) no-repeat top center; /* 170px x 200px */ 
+	background:url(../img/tutoriales/tuto_home.jpg) no-repeat top center; /* 170px x 200px */ 
 }
 
 #help_step2 > div{
@@ -211,7 +211,7 @@ body {
 }
 
 #help_step5 > div{
-	background:url(../img/tutoriales/tuto_pie.jpg) no-repeat top center; /* 170px x 200px */ 
+	background:url(../img/tutoriales/tuto_lineal.jpg) no-repeat top center; /* 170px x 200px */ 
 }
 
 .tutorial {      
@@ -256,7 +256,6 @@ body {
 }
 
 .chart-inner {
-	/*position: absolute;*/
     width: 100%; 
     height: 100%;
 }
@@ -265,6 +264,7 @@ body {
 	text-align: center;
 	display: block;
 	margin-bottom: 0;
+	font-weight: bold;
 }
 
 iframe {
@@ -364,9 +364,10 @@ fieldset label {
 	color: #ccc;
 }
 
-/*#pie .ui-content, #lineal .ui-content, #bars .ui-content, #maps .ui-content, #table .ui-content {
-	padding: 40px 0 70px 0;
-}*/
+#pie .ui-content, #lineal .ui-content, #bars .ui-content, #maps .ui-content, #table .ui-content {
+	padding: 0;
+	margin: 0;
+}
 
 #pie-slider-label, #maps-slider-label {
 	font-size: 1em;
@@ -410,7 +411,14 @@ div[data-role="header"] {
 	height: 42px !important;
 }
 
-.dataTables_wrapper {
+.table-cont {
 	overflow: scroll;
 	margin-top: 20px;
+	background-color: #000;
+	width: 100%;	
+}
+
+
+.dataTables_wrapper {	
+	background-color: #000;
 }
