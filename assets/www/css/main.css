@@ -15,7 +15,7 @@ body {
     -webkit-user-select: none;                  /* prevent copy paste, to allow, change 'none' to 'text' */
     background-color: #fff;				
     background-attachment:fixed;
-    font-family: 'Open Sans', sans-serif;
+/*     font-family: 'Open Sans', sans-serif; */
     height:100%;
     margin:0px;
     padding:0px;
@@ -84,7 +84,7 @@ body {
 }
 
 .event.received {
-    background-color:#4B946A;
+    background-color:#29abe2;
     display:none;
 }
 
@@ -195,7 +195,7 @@ body {
 
 /*Tutorial screen*/
 #help_step1 > div{
-	background:url(../img/manual.jpg) no-repeat top center; /* 170px x 200px */ 
+	background:url(../img/tutoriales/tuto_home.jpg) no-repeat top center; /* 170px x 200px */ 
 }
 
 #help_step2 > div{
@@ -211,7 +211,7 @@ body {
 }
 
 #help_step5 > div{
-	background:url(../img/tutoriales/tuto_pie.jpg) no-repeat top center; /* 170px x 200px */ 
+	background:url(../img/tutoriales/tuto_lineal.jpg) no-repeat top center; /* 170px x 200px */ 
 }
 
 .tutorial {      
@@ -256,7 +256,6 @@ body {
 }
 
 .chart-inner {
-	/*position: absolute;*/
     width: 100%; 
     height: 100%;
 }
@@ -265,6 +264,7 @@ body {
 	text-align: center;
 	display: block;
 	margin-bottom: 0;
+	font-weight: bold;
 }
 
 iframe {
@@ -364,9 +364,10 @@ fieldset label {
 	color: #ccc;
 }
 
-/*#pie .ui-content, #lineal .ui-content, #bars .ui-content, #maps .ui-content, #table .ui-content {
-	padding: 40px 0 70px 0;
-}*/
+#pie .ui-content, #lineal .ui-content, #bars .ui-content, #maps .ui-content, #table .ui-content {
+	padding: 0;
+	margin: 0;
+}
 
 #pie-slider-label, #maps-slider-label {
 	font-size: 1em;
@@ -375,29 +376,26 @@ fieldset label {
 	margin: 4px 0px 0px 10px;
 }
 
-#progressBar {
+#progressLabel {
+	margin:0;
+	padding:0;
+}
+
+.pb {
+	position: relative;
+	background: #000;
+	border: 1px solid #111;	
+	overflow: hidden;
 	margin: 5px auto;
 	width: 200px;
 	height: 22px;
 }
-
-#progressBar div {
-	height: 100%;
-	color: #fff;
-	text-align: right;
-	font-size: 12px;
-	line-height: 22px;
+.pb > div {
 	width: 0;
-}
-
-.pb {
-	background: #000;
-	border: 1px solid #111;	
-	border-radius: 5px;	
-	overflow: hidden;
-	box-shadow: 0 0 5px #333;
-}
-.pb div {
+	height: 22px;
+	position: absolute;
+	top: 0;
+	left: 0;
 	background-color: #1a82f7;
 	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#0099FF), to(#1a82f7)); 
 	background: -webkit-linear-gradient(top, #0099FF, #1a82f7); 
@@ -406,11 +404,30 @@ fieldset label {
 	background: -o-linear-gradient(top, #0099FF, #1a82f7);
 }
 
+.pb > p {
+	position: absolute;
+	font-weight: bold;
+	display: block;
+	width: 100%;
+	height: 20px;
+	text-align: center;
+	top: 0;
+	margin: 0;
+	padding: 0;
+}
+
 div[data-role="header"] {
 	height: 42px !important;
 }
 
-.dataTables_wrapper {
+.table-cont {
 	overflow: scroll;
 	margin-top: 20px;
+	background-color: #000;
+	width: 100%;	
+}
+
+
+.dataTables_wrapper {	
+	background-color: #000;
 }

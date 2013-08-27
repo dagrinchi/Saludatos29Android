@@ -1,6 +1,10 @@
+$(document).bind("mobileinit", function() {
+  $.mobile.page.prototype.options.addBackBtn = true;
+});
+
 var app = {
 
-  name: "Saludatos",
+  name: "SaluDatos",
 
   authors: "Alejandro Zarate: azarate@cool4code.com, Marcos Aguilera: maguilera@cool4code.com, Paola Vanegas: pvanegas@cool4code.com, David Alméciga: walmeciga@cool4code.com",
 
@@ -8,11 +12,19 @@ var app = {
 
   count: 0,
 
+  total: 0,
+
+  totalCount: 0,
+
+  totalCount2: 1000,
+
   data: [],
 
   results: {},
 
   years: [],
+
+  start: true,
 
   counters: {
     "counter-reg": 0,
@@ -139,6 +151,13 @@ var app = {
     console.log('Received Event: ' + id);
   },
 
+  chartHeight: function() {
+    var charts = ["#linealchartdiv", "#piechartdiv", "#columnchartdiv", "#geochartdiv"];
+    $.each(charts, function(k, v) {
+      $($(v).parents()[1]).width();
+    });
+  },
+
   buttonHeight: function() {
     console.log("buttonHeight: Ajustando el alto de los botones!");
     var wh = $("#home").height() - 200;
@@ -153,8 +172,11 @@ var app = {
     console.log("btnsEvents: Asignando eventos a los botones de las gráficas!");
 
     $("#update").on("click", function() {
+      app.start = false;
+      app.data = [];
+      app.count = 0;
       if (app.checkConnection()) {
-        app.load();
+        app.getTotal(app.load);
       } else {
         navigator.notification.alert('No hay una conexión a internet!', function() {
           app.onDeviceReady();
@@ -163,25 +185,43 @@ var app = {
     });
 
     $(".share").on("click", function(e) {
-      console.log("btnsEvents: Convirtiendo svg a canvas!");
+      console.log("btnsEvents: Convirtiendo a canvas!");
 
       app.showLoadingBox("Descargando gráfico!");
 
       var pageID = $(this).parents('[data-role="page"]').prop("id");
       /*  var content = $('#' + pageID + ' [data-role="content"] > div'); */
       var title = $('#' + pageID + ' .Title-Size').text();
-
-      var canvasObj = document.getElementById('canvas');
       var chartType = $(this).data("chart");
-      canvg(canvasObj, $("#" + chartType + " svg").clone().wrap('<div/>').parent().html());
+      var canvasObj;
+
+      if (chartType === "table") {
+        html2canvas($(".table-cont"), {
+          onrendered: function(canvas) {
+            canvasObj = canvas;
+          }
+        });
+      } else {
+        canvasObj = document.createElement("canvas");
+        canvg(canvasObj, $("#" + chartType + " svg").clone().wrap('<div/>').parent().html());
+      }
 
       setTimeout(function() {
-        if (device.platform === "Android") {
-          console.log("Compartiendo en Android!");
-          var social = window.plugins.social;
-          social.share(title, 'canvas');
-          app.hideLoadingBox();
+        switch (device.platform) {
+          case "Android":
+            console.log("Compartiendo en Android!");
+            var social = window.plugins.social;
+            social.share(title, canvasObj);
+            //          document.body.appendChild(canvasObj);
+            break;
+          case "iOS":
+            console.log("Compartiendo en iOS!");
+            var social = window.plugins.social;
+            social.share(title, 'http://www.minsalud.gov.co', canvasObj);
+            //          document.body.appendChild(canvasObj);
+            break;
         }
+        app.hideLoadingBox();
       }, 3000);
     });
 
@@ -202,6 +242,13 @@ var app = {
     });
 
     $("#reset").on("click", function(e) {
+      //$("#paisReferente").html("");
+      //$("#maps-slider").val(0);
+      // if (app["dataTable"] === "object") {
+      //   app.dataTable.fnClearTable(1);
+      //   app.dataTable.fnDestroy();  
+      // }
+      // $("#dtable").empty();
       $.each(app.selection, function(k1, v1) {
         $.each(v1['cols'], function(k2, v2) {
           app.selection[k1]['cols'][k2] = [];
@@ -234,10 +281,10 @@ var app = {
     });
 
     $("#table").on("pageshow", function() {
-      $(".dataTables_wrapper").scrollTo("100%", {
+      $(".table-cont").scrollTo("100%", {
         duration: 1500,
         onAfter: function() {
-          $(".dataTables_wrapper").scrollTo(0, {
+          $(".table-cont").scrollTo(0, {
             duration: 1000
           });
         }
@@ -343,8 +390,23 @@ var app = {
         $.mobile.changePage("#home");
       }, 4000);
     } else {
-      app.load();
+      app.getTotal(app.load);
     }
+  },
+
+  getTotal: function(cb) {
+    var url = "http://servicedatosabiertoscolombia.cloudapp.net/v1/Ministerio_de_Salud/indicadoresdesalud/consecutivo?$top=1&$orderby=consecutivo%20desc&$format=json";
+    var xhr = app.getJson2(url);
+    app.total = 0;
+    app.count = 0;
+    app.totalCount = 0;
+    app.totalCount2 = 1000;
+    xhr.success(function(r) {
+      app.totalCount = parseInt(r.d[0]["consecutivo"]);
+      app.total = parseInt(r.d[0]["consecutivo"]);
+    });
+
+    cb();
   },
 
   checkUpdatedData: function() {
@@ -368,6 +430,12 @@ var app = {
     var url = "http://servicedatosabiertoscolombia.cloudapp.net/v1/Ministerio_de_Salud/indicadoresdesalud?$format=json&$filter=id>" + app.count;
     var xhr = app.getJson(url);
     xhr.success(function(r) {
+      app.totalCount -= 1000;
+      if (app.totalCount > 1000) {
+        app.totalCount2 = 1000;
+      } else {
+        app.totalCount2 = app.totalCount; 
+      }
       $.each(r.d, function(k, v) {
         app.data.push(v);
       });
@@ -380,8 +448,15 @@ var app = {
         app.createDB();
       }
     });
-    $("#progressLabel").html("Cargando +" + app.count + " registros!");
     console.log("load: " + url);
+  },
+
+  getJson2: function(url) {
+    return $.ajax({
+      type: "GET",
+      url: url,
+      dataType: 'json'
+    });
   },
 
   getJson: function(url) {
@@ -391,13 +466,16 @@ var app = {
       dataType: 'json',
       error: function() {
         navigator.notification.alert('El repositorio de datos Open Data no está disponible ó se ha perdido la conexión con la red, inténtalo más tarde!', function() {
-          app.load();
+          app.getTotal(app.load);
         }, 'Atención', 'Reintentar');
       },
       progress: function(evt) {
         if (evt.lengthComputable) {
-          app.progressBar(parseInt((evt.loaded / evt.total * 100), 10), $("#progressBar"));
-          // console.log("Loaded " + parseInt( (evt.loaded / evt.total * 100), 10) + "%");
+          var unit = app.totalCount2 / evt.total;
+          cant = parseInt(unit * evt.loaded, 10) + app.count;
+          porcentaje = parseInt((cant / app.total * 100), 10);
+          app.progressBar(porcentaje, $("#progressBar"));
+          $("#progressLabel").html("Cargando " + cant + " de " + app.total + " registros!");
         } else {
           console.log("Length not computable.");
         }
@@ -447,7 +525,12 @@ var app = {
     var updated = new Date();
     window.localStorage.setItem("updated", updated);
     $("#date").html("<strong>" + updated + "</strong>");
-    $.mobile.changePage("#help_step1");
+    if (app.start) {
+      $.mobile.changePage("#help_step1");
+    } else {
+      $.mobile.changePage("#home");
+    }
+    
   },
 
   yea: function(tx, results) {
@@ -471,7 +554,7 @@ var app = {
 
       tx.executeSql('SELECT COUNT(*) AS counter FROM (' + app.buildSQL() + ')', [], reg, app.errorCB);
       app.years = [];
-      tx.executeSql('SELECT columnName from columnNames where columnName like "%yea%"', [], app.yea, app.errorCB);
+      tx.executeSql('SELECT DISTINCT columnName FROM columnNames WHERE columnName LIKE "yea%"', [], app.yea, app.errorCB);
 
       tx.executeSql("SELECT DISTINCT iddepto, nomdepto FROM (" + app.buildSQL() + ") WHERE nomdepto <> ''  AND iddepto <> '170' AND iddepto <> '09' AND iddepto <> '75' AND iddepto <> '11' GROUP BY iddepto ORDER BY nomdepto", [], function(tx, results) {
         app.counters["counter-dep"] = results.rows.length;
@@ -611,6 +694,8 @@ var app = {
         break;
       case "radio":
         $(list + " :" + type).on("click", app.eventRadios);
+        break;
+      default:
         break;
     }
   },
@@ -890,9 +975,9 @@ var app = {
             e.preventDefault();
           });
         } else {
-          $("#eduCount").html(len);
           $("#educacionBtn").off();
         }
+        $("#eduCount").html(len);
 
         for (var i = 0; i < len; i++) {
           html += '<input type="checkbox" data-vista="educacion" data-col="ideducacion" name="educacion-' + results.rows.item(i).ideducacion + '" id="educacion-' + results.rows.item(i).ideducacion + '" value="' + results.rows.item(i).ideducacion + '"/>';
@@ -922,9 +1007,9 @@ var app = {
             e.preventDefault();
           });
         } else {
-          $("#ocuCount").html(len);
           $("#ocupacionBtn").off();
         }
+        $("#ocuCount").html(len);
 
         for (var i = 0; i < len; i++) {
           html += '<input type="checkbox" data-vista="ocupacion" data-col="idocupacion" name="ocupacion-' + results.rows.item(i).idocupacion + '" id="ocupacion-' + results.rows.item(i).idocupacion + '" value="' + results.rows.item(i).idocupacion + '"/>';
@@ -954,9 +1039,9 @@ var app = {
             e.preventDefault();
           });
         } else {
-          $("#edaCount").html(len);
           $("#edadBtn").off();
         }
+        $("#edaCount").html(len);
 
         for (var i = 0; i < len; i++) {
           html += '<input type="checkbox" data-vista="edad" data-col="idedad" name="edad-' + results.rows.item(i).idedad + '" id="edad-' + results.rows.item(i).idedad + '" value="' + results.rows.item(i).idedad + '"/>';
@@ -986,9 +1071,9 @@ var app = {
             e.preventDefault();
           });
         } else {
-          $("#estCount").html(len);
           $("#estadocivilBtn").off();
         }
+        $("#estCount").html(len);
 
         for (var i = 0; i < len; i++) {
           html += '<input type="checkbox" data-vista="estadocivil" data-col="idestadocivil" name="estadocivil-' + results.rows.item(i).idestadocivil + '" id="estadocivil-' + results.rows.item(i).idestadocivil + '" value="' + results.rows.item(i).idestadocivil + '"/>';
@@ -1018,9 +1103,9 @@ var app = {
             e.preventDefault();
           });
         } else {
-          $("#genCount").html(len);
           $("#generoBtn").off();
         }
+        $("#genCount").html(len);
 
         for (var i = 0; i < len; i++) {
           html += '<input type="checkbox" data-vista="sexo" data-col="idsexo" name="genero-' + results.rows.item(i).idsexo + '" id="genero-' + results.rows.item(i).idsexo + '" value="' + results.rows.item(i).idsexo + '"/>';
@@ -1281,7 +1366,8 @@ var app = {
               plotShadow: false,
               // spacingTop: 10,
               height: app.homeheight,
-              borderRadius: 0
+              borderRadius: 0,
+              width: $($("#piechartdiv").parents()[1]).width()
             },
             exporting: {
               enabled: false
@@ -1336,6 +1422,10 @@ var app = {
 
     lineal: function() {
 
+      // if (app.selection.departamento.cols.iddepto.length > 0 && app.selection.departamento.cols.iddepto.indexOf("170") === -1) {
+      //   app.selection.departamento.cols.iddepto.push("170");
+      // }
+
       app.openDB(query);
 
       function query(tx) {
@@ -1383,7 +1473,7 @@ var app = {
 
             for (b = 0; b < results.rows.length; b++) {
               var row = results.rows.item(b);
-              if (row["yea" + app.years[a]] !== '' && row["yea" + app.years[a]] !== '-' && row["yea" + app.years[a]] !== null && parseFloat(row["yea" + app.years[a]]) !== 0.0) {
+              if (row["yea" + app.years[a]] !== null && row["yea" + app.years[a]] !== '') {
                 yearstoprint[a] = true;
               }
 
@@ -1420,14 +1510,14 @@ var app = {
 
             //Verificacion de Regiones
 
-            if (dataresults["nomregion"] !== null && dataresults["nomregion"] !== '' && parseFloat(dataresults["nomregion"]) !== 0.0 && printregion) {
+            if (dataresults["nomregion"] !== null && dataresults["nomregion"] !== '' && printregion) {
               console.log(" Region" + p + ": " + dataresults["nomregion"]);
               departamentos.push(dataresults["nomregion"]);
               geograficas.push(dataresults["nomregion"]);
               console.log("Numero de años:" + app.years.length);
               for (var l = 0; l < app.years.length; l++) {
                 if (yearstoprint[l]) {
-                  if (dataresults["yea" + app.years[l]] !== '' && dataresults["yea" + app.years[l]] !== null && dataresults["yea" + app.years[l]] !== '-' && parseFloat(dataresults["yea" + app.years[l]]) !== 0.0) {
+                  if (dataresults["yea" + app.years[l]] !== '' && dataresults["yea" + app.years[l]] !== null && dataresults["yea" + app.years[l]] !== '-') {
                     rowdata.push(parseFloat(dataresults["yea" + app.years[l]]));
                     console.log(l + " Año " + app.years[l] + " :" + dataresults["yea" + app.years[l]]);
                   } else {
@@ -1448,16 +1538,19 @@ var app = {
 
 
             //Verificacion de Subregiones
-            else if (dataresults["nomsubregion"] !== null && dataresults["nomsubregion"] !== '' && parseFloat(dataresults["nomsubregion"]) !== 0.0 && printsubregion) {
+            else if (dataresults["nomsubregion"] !== null && dataresults["nomsubregion"] !== '' && printsubregion) {
               console.log(" Subregion" + p + ": " + dataresults["nomsubregion"]);
               departamentos.push(dataresults["nomsubregion"]);
               geograficas.push(dataresults["nomsubregion"]);
               console.log("Numero de años:" + app.years.length);
               for (var z = 0; z < app.years.length; z++) {
                 if (yearstoprint[z]) {
-                  if (dataresults["yea" + app.years[z]] !== '' && dataresults["yea" + app.years[z]] !== null && dataresults["yea" + app.years[z]] !== '-' && parseFloat(dataresults["yea" + app.years[z]]) !== 0.0) {
+                  if (dataresults["yea" + app.years[z]] !== '' && dataresults["yea" + app.years[z]] !== null && dataresults["yea" + app.years[z]] !== '-') {
                     rowdata.push(parseFloat(dataresults["yea" + app.years[z]]));
                     console.log(z + " Año " + app.years[z] + " :" + dataresults["yea" + app.years[z]]);
+                  } else {
+                    rowdata.push(0.0);
+                    console.log(l + " Año " + app.years[l] + " : 0");
                   }
                 }
               }
@@ -1472,7 +1565,7 @@ var app = {
             }
 
             //Verificación de municipios
-            else if (dataresults["nommpio"] !== null && dataresults["nommpio"] !== '' && parseFloat(dataresults["nommpio"]) != 0.0 && printtown) {
+            else if (dataresults["nommpio"] !== null && dataresults["nommpio"] !== '' && printtown) {
               printstate = false;
               console.log(" Municipio " + p + ": " + dataresults["nommpio"]);
               municipios.push(dataresults["nommpio"]);
@@ -1480,9 +1573,12 @@ var app = {
               console.log("Numero de años:" + app.years.length);
               for (var l = 0; l < app.years.length; l++) {
                 if (yearstoprint[l]) {
-                  if (dataresults["yea" + app.years[l]] !== '' && dataresults["yea" + app.years[l]] !== null && parseFloat(dataresults["yea" + app.years[l]]) !== 0.0 && dataresults["yea" + app.years[l]] !== '-') {
+                  if (dataresults["yea" + app.years[l]] !== '' && dataresults["yea" + app.years[l]] !== null && dataresults["yea" + app.years[l]] !== '-') {
                     rowdata.push(parseFloat(dataresults["yea" + app.years[l]]));
                     console.log(l + " Año " + app.years[l] + " :" + dataresults["yea" + app.years[l]]);
+                  } else {
+                    rowdata.push(0.0);
+                    console.log(l + " Año " + app.years[l] + " : 0");
                   }
                 }
               }
@@ -1497,18 +1593,20 @@ var app = {
             }
 
 
-
             //Verificación de departamentos
-            else if (dataresults["nomdepto"] !== null && dataresults["nomdepto"] !== '' && parseFloat(dataresults["nomdepto"]) != 0.0 && printstate) {
+            else if (dataresults["nomdepto"] !== null && dataresults["nomdepto"] !== '' && printstate) {
               console.log(" Departamento " + p + ": " + dataresults["nomdepto"]);
               departamentos.push(dataresults["nomdepto"]);
               geograficas.push(dataresults["nomdepto"]);
               console.log("Numero de años:" + app.years.length);
               for (var l = 0; l < app.years.length; l++) {
                 if (yearstoprint[l]) {
-                  if (dataresults["yea" + app.years[l]] !== '' && dataresults["yea" + app.years[l]] !== null && dataresults["yea" + app.years[l]] !== '-' && parseFloat(dataresults["yea" + app.years[l]]) !== 0.0) {
+                  if (dataresults["yea" + app.years[l]] !== '' && dataresults["yea" + app.years[l]] !== null && dataresults["yea" + app.years[l]] !== '-') {
                     rowdata.push(parseFloat(dataresults["yea" + app.years[l]]));
                     console.log(l + " Año " + app.years[l] + " :" + dataresults["yea" + app.years[l]]);
+                  } else {
+                    rowdata.push(0.0);
+                    console.log(l + " Año " + app.years[l] + " : 0");
                   }
                 }
               }
@@ -1523,16 +1621,19 @@ var app = {
             }
 
             //Verificación de zonas
-            else if (dataresults["nomzona"] !== null && dataresults["nomzona"] !== '' && parseFloat(dataresults["nomzona"]) != 0.0 && printzone) {
+            else if (dataresults["nomzona"] !== null && dataresults["nomzona"] !== '' && printzone) {
               console.log(" Zona " + p + ": " + dataresults["nomzona"]);
               municipios.push(dataresults["nomzona"]);
               geograficas.push(dataresults["nomzona"]);
               console.log("Numero de años:" + app.years.length);
               for (var l = 0; l < app.years.length; l++) {
                 if (yearstoprint[l]) {
-                  if (dataresults["yea" + app.years[l]] !== '' && dataresults["yea" + app.years[l]] !== null && parseFloat(dataresults["yea" + app.years[l]]) !== 0.0 && dataresults["yea" + app.years[l]] !== '-') {
+                  if (dataresults["yea" + app.years[l]] !== '' && dataresults["yea" + app.years[l]] !== null && dataresults["yea" + app.years[l]] !== '-') {
                     rowdata.push(parseFloat(dataresults["yea" + app.years[l]]));
                     console.log(l + " Año " + app.years[l] + " :" + dataresults["yea" + app.years[l]]);
+                  } else {
+                    rowdata.push(0.0);
+                    console.log(l + " Año " + app.years[l] + " : 0");
                   }
                 }
               }
@@ -1547,9 +1648,12 @@ var app = {
             } else {
               for (var l = 0; l < app.years.length; l++) {
                 if (yearstoprint[l]) {
-                  if (dataresults["yea" + app.years[l]] !== '' && dataresults["yea" + app.years[l]] !== null && parseFloat(dataresults["yea" + app.years[l]]) !== 0.0 && dataresults["yea" + app.years[l]] !== '-') {
+                  if (dataresults["yea" + app.years[l]] !== '' && dataresults["yea" + app.years[l]] !== null && dataresults["yea" + app.years[l]] !== '-') {
                     rowdata.push(parseFloat(dataresults["yea" + app.years[l]]));
                     console.log(l + " Año " + app.years[l] + " :" + dataresults["yea" + app.years[l]]);
+                  } else {
+                    rowdata.push(0.0);
+                    console.log(l + " Año " + app.years[l] + " : 0");
                   }
                 }
               }
@@ -1558,7 +1662,6 @@ var app = {
               serie["data"] = rowdata;
               theseries.push(serie);
             }
-
 
 
             //FIN DE printData
@@ -1575,8 +1678,9 @@ var app = {
               plotBorderWidth: null,
               plotShadow: false,
               height: app.homeheight,
-              borderRadius: 0
-              // margin: [30, 10, 10, 10]
+              borderRadius: 0,
+              width: $(document).width() - 5
+              //              margin: [10, 10, 10, 10]
             },
             exporting: {
               enabled: false
@@ -1596,17 +1700,14 @@ var app = {
               categories: thecategories,
               labels: {
                 rotation: -45,
-                align: 'right',
-                style: {
-                  fontSize: '13px',
-                  fontFamily: 'Verdana, sans-serif'
-                }
+                align: 'right'
               }
             },
             yAxis: {
               title: {
                 text: results.rows.item(0).nomunidad
               },
+              min: 0,
               plotLines: [{
                 value: 0,
                 width: 1,
@@ -1620,7 +1721,8 @@ var app = {
               align: "center",
               verticalAlign: "top",
               borderWidth: 1,
-              margin: 20 //define el espacio entre el legend y la zona de grafico
+              margin: 5,
+              x: 15,
             },
             series: theseries
 
@@ -1637,6 +1739,10 @@ var app = {
     },
 
     bars: function() {
+
+      // if (app.selection.departamento.cols.iddepto.length > 0 && app.selection.departamento.cols.iddepto.indexOf("170") === -1) {
+      //   app.selection.departamento.cols.iddepto.push("170");
+      // }
 
       app.openDB(query);
 
@@ -1684,7 +1790,7 @@ var app = {
 
             for (b = 0; b < results.rows.length; b++) {
               var row = results.rows.item(b);
-              if (row["yea" + app.years[a]] !== '' && row["yea" + app.years[a]] !== '-' && row["yea" + app.years[a]] !== null && parseFloat(row["yea" + app.years[a]]) !== 0.0) {
+              if (row["yea" + app.years[a]] !== null && row["yea" + app.years[a]] !== '') {
                 yearstoprint[a] = true;
               }
 
@@ -1719,17 +1825,16 @@ var app = {
             thelocation = dataresults["nommpio"] + dataresults["nomdepto"] + dataresults["nomzona"] + dataresults["nomsubregion"] + dataresults["nomregion"];
 
 
-
             //Verificacion de Regiones
 
-            if (dataresults["nomregion"] !== null && dataresults["nomregion"] !== '' && parseFloat(dataresults["nomregion"]) != 0.0 && printregion) {
+            if (dataresults["nomregion"] !== null && dataresults["nomregion"] !== '' && printregion) {
               console.log(" Region" + p + ": " + dataresults["nomregion"]);
               departamentos.push(dataresults["nomregion"]);
               geograficas.push(dataresults["nomregion"]);
               console.log("Numero de años:" + app.years.length);
               for (var l = 0; l < app.years.length; l++) {
                 if (yearstoprint[l]) {
-                  if (dataresults["yea" + app.years[l]] !== '' && dataresults["yea" + app.years[l]] !== null && dataresults["yea" + app.years[l]] !== '-' && parseFloat(dataresults["yea" + app.years[l]]) !== 0.0) {
+                  if (dataresults["yea" + app.years[l]] !== '' && dataresults["yea" + app.years[l]] !== null && dataresults["yea" + app.years[l]] !== '-') {
                     rowdata.push(parseFloat(dataresults["yea" + app.years[l]]));
                     console.log(l + " Año " + app.years[l] + " :" + dataresults["yea" + app.years[l]]);
                   } else {
@@ -1750,16 +1855,19 @@ var app = {
 
 
             //Verificacion de Subregiones
-            else if (dataresults["nomsubregion"] !== null && dataresults["nomsubregion"] !== '' && parseFloat(dataresults["nomsubregion"]) != 0.0 && printsubregion) {
+            else if (dataresults["nomsubregion"] !== null && dataresults["nomsubregion"] !== '' && printsubregion) {
               console.log(" Subregion" + p + ": " + dataresults["nomsubregion"]);
               departamentos.push(dataresults["nomsubregion"]);
               geograficas.push(dataresults["nomsubregion"]);
               console.log("Numero de años:" + app.years.length);
               for (var l = 0; l < app.years.length; l++) {
                 if (yearstoprint[l]) {
-                  if (dataresults["yea" + app.years[l]] !== '' && dataresults["yea" + app.years[l]] !== null && dataresults["yea" + app.years[l]] !== '-' && parseFloat(dataresults["yea" + app.years[l]]) !== 0.0) {
+                  if (dataresults["yea" + app.years[l]] !== '' && dataresults["yea" + app.years[l]] !== null && dataresults["yea" + app.years[l]] !== '-') {
                     rowdata.push(parseFloat(dataresults["yea" + app.years[l]]));
                     console.log(l + " Año " + app.years[l] + " :" + dataresults["yea" + app.years[l]]);
+                  } else {
+                    rowdata.push(0.0);
+                    console.log(l + " Año " + app.years[l] + " : 0");
                   }
                 }
               }
@@ -1774,7 +1882,7 @@ var app = {
             }
 
             //Verificación de municipios
-            else if (dataresults["nommpio"] !== null && dataresults["nommpio"] !== '' && parseFloat(dataresults["nommpio"]) != 0.0 && printtown) {
+            else if (dataresults["nommpio"] !== null && dataresults["nommpio"] !== '' && printtown) {
               printstate = false;
               console.log(" Municipio " + p + ": " + dataresults["nommpio"]);
               municipios.push(dataresults["nommpio"]);
@@ -1782,9 +1890,12 @@ var app = {
               console.log("Numero de años:" + app.years.length);
               for (var l = 0; l < app.years.length; l++) {
                 if (yearstoprint[l]) {
-                  if (dataresults["yea" + app.years[l]] !== '' && dataresults["yea" + app.years[l]] !== null && parseFloat(dataresults["yea" + app.years[l]]) !== 0.0 && dataresults["yea" + app.years[l]] !== '-') {
+                  if (dataresults["yea" + app.years[l]] !== '' && dataresults["yea" + app.years[l]] !== null && dataresults["yea" + app.years[l]] !== '-') {
                     rowdata.push(parseFloat(dataresults["yea" + app.years[l]]));
                     console.log(l + " Año " + app.years[l] + " :" + dataresults["yea" + app.years[l]]);
+                  } else {
+                    rowdata.push(0.0);
+                    console.log(l + " Año " + app.years[l] + " : 0");
                   }
                 }
               }
@@ -1799,18 +1910,20 @@ var app = {
             }
 
 
-
             //Verificación de departamentos
-            else if (dataresults["nomdepto"] !== null && dataresults["nomdepto"] !== '' && parseFloat(dataresults["nomdepto"]) != 0.0 && printstate) {
+            else if (dataresults["nomdepto"] !== null && dataresults["nomdepto"] !== '' && printstate) {
               console.log(" Departamento " + p + ": " + dataresults["nomdepto"]);
               departamentos.push(dataresults["nomdepto"]);
               geograficas.push(dataresults["nomdepto"]);
               console.log("Numero de años:" + app.years.length);
               for (var l = 0; l < app.years.length; l++) {
                 if (yearstoprint[l]) {
-                  if (dataresults["yea" + app.years[l]] !== '' && dataresults["yea" + app.years[l]] !== null && dataresults["yea" + app.years[l]] !== '-' && parseFloat(dataresults["yea" + app.years[l]]) !== 0.0) {
+                  if (dataresults["yea" + app.years[l]] !== '' && dataresults["yea" + app.years[l]] !== null && dataresults["yea" + app.years[l]] !== '-') {
                     rowdata.push(parseFloat(dataresults["yea" + app.years[l]]));
                     console.log(l + " Año " + app.years[l] + " :" + dataresults["yea" + app.years[l]]);
+                  } else {
+                    rowdata.push(0.0);
+                    console.log(l + " Año " + app.years[l] + " : 0");
                   }
                 }
               }
@@ -1825,16 +1938,19 @@ var app = {
             }
 
             //Verificación de zonas
-            else if (dataresults["nomzona"] !== null && dataresults["nomzona"] !== '' && parseFloat(dataresults["nomzona"]) != 0.0 && printzone) {
+            else if (dataresults["nomzona"] !== null && dataresults["nomzona"] !== '' && printzone) {
               console.log(" Zona " + p + ": " + dataresults["nomzona"]);
               municipios.push(dataresults["nomzona"]);
               geograficas.push(dataresults["nomzona"]);
               console.log("Numero de años:" + app.years.length);
               for (var l = 0; l < app.years.length; l++) {
                 if (yearstoprint[l]) {
-                  if (dataresults["yea" + app.years[l]] !== '' && dataresults["yea" + app.years[l]] !== null && parseFloat(dataresults["yea" + app.years[l]]) !== 0.0 && dataresults["yea" + app.years[l]] !== '-') {
+                  if (dataresults["yea" + app.years[l]] !== '' && dataresults["yea" + app.years[l]] !== null && dataresults["yea" + app.years[l]] !== '-') {
                     rowdata.push(parseFloat(dataresults["yea" + app.years[l]]));
                     console.log(l + " Año " + app.years[l] + " :" + dataresults["yea" + app.years[l]]);
+                  } else {
+                    rowdata.push(0.0);
+                    console.log(l + " Año " + app.years[l] + " : 0");
                   }
                 }
               }
@@ -1849,9 +1965,12 @@ var app = {
             } else {
               for (var l = 0; l < app.years.length; l++) {
                 if (yearstoprint[l]) {
-                  if (dataresults["yea" + app.years[l]] !== '' && dataresults["yea" + app.years[l]] !== null && parseFloat(dataresults["yea" + app.years[l]]) !== 0.0 && dataresults["yea" + app.years[l]] !== '-') {
+                  if (dataresults["yea" + app.years[l]] !== '' && dataresults["yea" + app.years[l]] !== null && dataresults["yea" + app.years[l]] !== '-') {
                     rowdata.push(parseFloat(dataresults["yea" + app.years[l]]));
                     console.log(l + " Año " + app.years[l] + " :" + dataresults["yea" + app.years[l]]);
+                  } else {
+                    rowdata.push(0.0);
+                    console.log(l + " Año " + app.years[l] + " : 0");
                   }
                 }
               }
@@ -1873,7 +1992,8 @@ var app = {
               plotBorderWidth: null,
               plotShadow: false,
               height: app.homeheight,
-              borderRadius: 0
+              borderRadius: 0,
+              width: $(document).width()
             },
             exporting: {
               enabled: false
@@ -1905,9 +2025,9 @@ var app = {
             legend: {
               align: "center",
               verticalAlign: "top",
-              x: 0,
-              y: 20,
-              borderWidth: 0
+              borderWidth: 0,
+              margin: 5,
+              x: 10
             },
             title: {
               text: '',
@@ -1923,6 +2043,7 @@ var app = {
             series: theseries
           });
 
+          chart.redraw();
           app.hideLoadingBox();
         }
       }
@@ -1930,6 +2051,9 @@ var app = {
 
     maps: function() {
 
+      if (app.selection.departamento.cols.iddepto.length > 0 && app.selection.departamento.cols.iddepto.indexOf("170") === -1) {
+        app.selection.departamento.cols.iddepto.push("170");
+      }
 
       var datatoprint = [];
       var regiones = [];
@@ -1957,8 +2081,8 @@ var app = {
       app.openDB(query);
 
       function query(tx) {
-
-        tx.executeSql(app.buildSQL(), [], printData, app.errorCB);
+        var sql = app.buildSQL();
+        tx.executeSql(sql, [], printData, app.errorCB);
 
         function printData(tx, results) {
 
@@ -1967,7 +2091,7 @@ var app = {
 
             for (b = 0; b < results.rows.length; b++) {
               var row = results.rows.item(b);
-              if (row["yea" + app.years[a]] !== '' && row["yea" + app.years[a]] !== '-' && row["yea" + app.years[a]] !== null && parseFloat(row["yea" + app.years[a]]) !== 0.0) {
+              if (row["yea" + app.years[a]] !== null && row["yea" + app.years[a]] !== '') {
                 yearstoprint[a] = true;
               }
 
@@ -2004,7 +2128,11 @@ var app = {
 
           for (var j = 0; j < results.rows.length; j++) {
             var dataresults = results.rows.item(j);
-            if (!(isNaN(parseFloat(dataresults["yea" + theyear]))) && parseFloat(dataresults["yea" + theyear]) !== 0.0) {
+            if (!(isNaN(parseFloat(dataresults["yea" + theyear])))) {
+
+              if (dataresults["iddepto"] === "170") {
+                $("#paisReferente").html("<strong>" + dataresults["nomdepto"] + ": </strong>" + parseFloat(dataresults["yea" + theyear]) + " " + dataresults["nomunidad"]);
+              }
 
 
               if (dataresults["nommpio"] !== null && dataresults["nommpio"] !== '' && dataresults["nommpio"] !== '-' && printtown) {
@@ -2041,6 +2169,7 @@ var app = {
             resolution: 'provinces',
             displayMode: 'regions',
             height: app.homeheight - 150,
+            width: $(document).width(),
             // magnifyingGlass: {
             //   enable: "true",
             //   zoomFactor: "10.0"
@@ -2068,250 +2197,236 @@ var app = {
 
     table: function() {
 
+      // if (app.selection.departamento.cols.iddepto.length > 0 && app.selection.departamento.cols.iddepto.indexOf("170") === -1) {
+      //   app.selection.departamento.cols.iddepto.push("170");
+      // }
+
+      if (typeof app.dataTable === "object") {
+        app.dataTable.fnDestroy();
+        $("#dtable").empty();
+      }
+
       app.openDB(query);
 
       function query(tx) {
 
         tx.executeSql(app.buildSQL(), [], buildTable, app.errorCB);
-        var datatoprint = [];
-        var regiones = [];
-        var subregiones = [];
-        var departamentos = [];
-        var municipios = [];
-        var zonas = [];
-        var geograficas = [];
-        var theseries = [];
-        var thecategories = [];
-        var yearstoprint = [];
-
-        //Determinan que tipos de ubicaciones geográficas se mostrarán en el gráfico
-        var printstate = true;
-        var printtown = true;
-        var printzone = true;
-        var printregion = true;
-        var printsubregion = true;
-
-
-        for (c = 0; c < app.years.length; c++) {
-          yearstoprint.push(false);
-        }
-
-
 
         function buildTable(tx, results) {
 
           $("#table .Title-Size").html(results.rows.item(0).nomindicador);
 
           var indicator = results.rows.item(0).idindicador;
-          console.log("El indicador fué: " + indicator);
-          console.log("El número de resultados fué: " + results.rows.length);
-          console.log("Consulta realizada");
-          console.log("Numero de resultados de la consulta " + results.rows.length);
-          console.log("Indicador para insertar datos en el gráfico:" + indicator);
 
+          checkYears(printYears, categories, dataset);
 
-          //Verificar años para cuáles hay datos
+          function checkYears(cb1, cb2, cb3) {
+            app["colums"] = [];
+            app["tabledata"] = [];
 
-
-          for (a = 0; a < app.years.length; a++) {
-
-
-            for (b = 0; b < results.rows.length; b++) {
-              var row = results.rows.item(b);
-              if (row["yea" + app.years[a]] !== '' && row["yea" + app.years[a]] !== '-' && row["yea" + app.years[a]] !== null && parseFloat(row["yea" + app.years[a]]) !== 0.0) {
-                yearstoprint[a] = true;
-              }
-
+            console.log("chart.table: checkYears");
+            var yearstoprint = [];
+            for (c = 0; c < app.years.length; c++) {
+              yearstoprint.push(false);
             }
+
+            for (a = 0; a < app.years.length; a++) {
+              for (b = 0; b < results.rows.length; b++) {
+                var row = results.rows.item(b);
+                if (row["yea" + app.years[a]] !== null && row["yea" + app.years[a]] !== '') {
+                  yearstoprint[a] = true;
+                }
+              }
+            }
+            cb1(yearstoprint, cb2, cb3);
 
           }
 
-          // Insertar las categorias segun los años que tienen datos
-
-          console.log("AÑOS A IMPRIMIR: ");
-          for (d = 0; d < app.years.length; d++) {
-            if (yearstoprint[d]) {
-              thecategories.push(app.years[d]);
-            }
-          }
-          console.log("LAS CATEGORIAS");
-          for (e = 0; e < thecategories.length; e++) {}
-
-          for (var p = 0; p < results.rows.length; p++) {
-            var dataresults = results.rows.item(p);
-            var serie = {};
-            var rowdata = [];
 
 
-            var thestring = [];
-            thestring = dataresults["nomregimen"] + dataresults["nomeps"] + dataresults["nomips"] + dataresults["nomregimen"] + dataresults["nomeducacion"] + dataresults["nomocupacion"] + dataresults["nomsexo"] + dataresults["nometnia"] + dataresults["nomedad"] + dataresults["nomestadocivil"];
-            var thelocation = [];
-            thelocation = dataresults["nommpio"] + dataresults["nomdepto"] + dataresults["nomzona"] + dataresults["nomsubregion"] + dataresults["nomregion"];
-
-
-
-            //Verificacion de Regiones
-
-            if (dataresults["nomregion"] !== null && dataresults["nomregion"] !== '' && parseFloat(dataresults["nomregion"]) != 0.0 && printregion) {
-              console.log(" Region" + p + ": " + dataresults["nomregion"]);
-              departamentos.push(dataresults["nomregion"]);
-              geograficas.push(dataresults["nomregion"]);
-              for (var l = 0; l < app.years.length; l++) {
-                if (yearstoprint[l]) {
-                  if (dataresults["yea" + app.years[l]] !== '' && dataresults["yea" + app.years[l]] !== null && dataresults["yea" + app.years[l]] !== '-' && parseFloat(dataresults["yea" + app.years[l]]) !== 0.0) {
-                    rowdata.push(parseFloat(dataresults["yea" + app.years[l]]));
-                  } else {
-                    rowdata.push(0.0);
-                  }
-                }
+          function printYears(yearstoprint, cb1, cb2) {
+            console.log("chart.table: printYears");
+            var thecategories = [];
+            for (d = 0; d < app.years.length; d++) {
+              if (yearstoprint[d]) {
+                thecategories.push(app.years[d]);
               }
-
-              serie["name"] = dataresults["nomregion"] + " " + thestring;
-              serie["data"] = rowdata;
-              theseries.push(serie);
             }
-
-
-            //Verificacion de Subregiones
-            else if (dataresults["nomsubregion"] !== null && dataresults["nomsubregion"] !== '' && parseFloat(dataresults["nomsubregion"]) != 0.0 && printsubregion) {
-              console.log(" Subregion" + p + ": " + dataresults["nomsubregion"]);
-              departamentos.push(dataresults["nomsubregion"]);
-              geograficas.push(dataresults["nomsubregion"]);
-              for (var l = 0; l < app.years.length; l++) {
-                if (yearstoprint[l]) {
-                  if (dataresults["yea" + app.years[l]] !== '' && dataresults["yea" + app.years[l]] !== null && dataresults["yea" + app.years[l]] !== '-' && parseFloat(dataresults["yea" + app.years[l]]) !== 0.0) {
-                    rowdata.push(parseFloat(dataresults["yea" + app.years[l]]));
-                  } else {
-                    rowdata.push(0.0);
-                  }
-                }
-              }
-
-              serie["name"] = dataresults["nomsubregion"] + " " + thestring;
-              serie["data"] = rowdata;
-              theseries.push(serie);
-            }
-
-            //Verificación de municipios
-            else if (dataresults["nommpio"] !== null && dataresults["nommpio"] !== '' && parseFloat(dataresults["nommpio"]) != 0.0 && printtown) {
-              printstate = false;
-              console.log(" Municipio " + p + ": " + dataresults["nommpio"]);
-              municipios.push(dataresults["nommpio"]);
-              geograficas.push(dataresults["nommpio"]);
-              console.log("Numero de años:" + app.years.length);
-              for (var l = 0; l < app.years.length; l++) {
-                if (yearstoprint[l]) {
-                  if (dataresults["yea" + app.years[l]] !== '' && dataresults["yea" + app.years[l]] !== null && parseFloat(dataresults["yea" + app.years[l]]) !== 0.0 && dataresults["yea" + app.years[l]] !== '-') {
-                    rowdata.push(parseFloat(dataresults["yea" + app.years[l]]));
-                  } else {
-                    rowdata.push(0.0);
-                  }
-                }
-              }
-
-              serie["name"] = dataresults["nommpio"] + " " + thestring;
-              serie["data"] = rowdata;
-              theseries.push(serie);
-            }
-
-
-
-            //Verificación de departamentos
-            else if (dataresults["nomdepto"] !== null && dataresults["nomdepto"] !== '' && parseFloat(dataresults["nomdepto"]) != 0.0 && printstate) {
-              console.log(" Departamento " + p + ": " + dataresults["nomdepto"]);
-              departamentos.push(dataresults["nomdepto"]);
-              geograficas.push(dataresults["nomdepto"]);
-              for (var l = 0; l < app.years.length; l++) {
-                if (yearstoprint[l]) {
-                  if (dataresults["yea" + app.years[l]] !== '' && dataresults["yea" + app.years[l]] !== null && dataresults["yea" + app.years[l]] !== '-' && parseFloat(dataresults["yea" + app.years[l]]) !== 0.0) {
-                    rowdata.push(parseFloat(dataresults["yea" + app.years[l]]));
-                  } else {
-                    rowdata.push(0.0);
-                  }
-                }
-              }
-
-              serie["name"] = dataresults["nomdepto"] + " " + thestring;
-              serie["data"] = rowdata;
-              theseries.push(serie);
-            }
-
-            //Verificación de zonas
-            else if (dataresults["nomzona"] !== null && dataresults["nomzona"] !== '' && parseFloat(dataresults["nomzona"]) != 0.0 && printzone) {
-              console.log(" Zona " + p + ": " + dataresults["nomzona"]);
-              municipios.push(dataresults["nomzona"]);
-              geograficas.push(dataresults["nomzona"]);
-              console.log("Numero de años:" + app.years.length);
-              for (var l = 0; l < app.years.length; l++) {
-                if (yearstoprint[l]) {
-                  if (dataresults["yea" + app.years[l]] !== '' && dataresults["yea" + app.years[l]] !== null && parseFloat(dataresults["yea" + app.years[l]]) !== 0.0 && dataresults["yea" + app.years[l]] !== '-') {
-                    rowdata.push(parseFloat(dataresults["yea" + app.years[l]]));
-                  } else {
-                    rowdata.push(0.0);
-                  }
-                }
-              }
-
-              serie["name"] = dataresults["nomzona"] + " " + thestring;
-              serie["data"] = rowdata;
-              theseries.push(serie);
-            } else {
-              for (var l = 0; l < app.years.length; l++) {
-                if (yearstoprint[l]) {
-                  if (dataresults["yea" + app.years[l]] !== '' && dataresults["yea" + app.years[l]] !== null && parseFloat(dataresults["yea" + app.years[l]]) !== 0.0 && dataresults["yea" + app.years[l]] !== '-') {
-                    rowdata.push(parseFloat(dataresults["yea" + app.years[l]]));
-                  } else {
-                    rowdata.push(0.0);
-                  }
-                }
-              }
-
-              serie["name"] = thelocation + " " + thestring;
-              serie["data"] = rowdata;
-              theseries.push(serie);
-            }
-
-
-
+            cb1(thecategories, yearstoprint, cb2);
           }
 
-          //var aDataSet = [
-          //  ['Trident', 'Internet Explorer 4.0', 'Win 95+', '4', 'X']
-          //];
-          var aDataSet = [];
+          function categories(thecategories, yearstoprint, cb) {
+            console.log("chart.table: categories");
+            var theseries = [];
+            var datatoprint = [];
+            var regiones = [];
+            var subregiones = [];
+            var departamentos = [];
+            var municipios = [];
+            var zonas = [];
+            var geograficas = [];
 
-          for (s = 0; s < theseries.length; s++) {
-            var aSingle = [];
-            aSingle.push(theseries[s].name);
-            for (t = 0; t < theseries[s].data.length; t++) {
-              aSingle.push(theseries[s].data[t]);
+            //Determinan que tipos de ubicaciones geográficas se mostrarán en el gráfico
+            var printstate = true;
+            var printtown = true;
+            var printzone = true;
+            var printregion = true;
+            var printsubregion = true;
+
+            for (var p = 0; p < results.rows.length; p++) {
+              var dataresults = results.rows.item(p);
+              var serie = {};
+              var rowdata = [];
+
+
+              var thestring = [];
+              thestring = dataresults["nomregimen"] + dataresults["nomeps"] + dataresults["nomips"] + dataresults["nomregimen"] + dataresults["nomeducacion"] + dataresults["nomocupacion"] + dataresults["nomsexo"] + dataresults["nometnia"] + dataresults["nomedad"] + dataresults["nomestadocivil"];
+              var thelocation = [];
+              thelocation = dataresults["nommpio"] + dataresults["nomdepto"] + dataresults["nomzona"] + dataresults["nomsubregion"] + dataresults["nomregion"];
+
+
+              //Verificacion de Regiones
+
+              if (dataresults["nomregion"] !== null && dataresults["nomregion"] !== '' && printregion) {
+                departamentos.push(dataresults["nomregion"]);
+                geograficas.push(dataresults["nomregion"]);
+                for (var l = 0; l < app.years.length; l++) {
+                  if (yearstoprint[l]) {
+                    
+                      rowdata.push(dataresults["yea" + app.years[l]]);
+                    
+                  }
+                }
+
+                serie["name"] = dataresults["nomregion"] + " " + thestring;
+                serie["data"] = rowdata;
+                theseries.push(serie);
+              }
+
+
+              //Verificacion de Subregiones
+              else if (dataresults["nomsubregion"] !== null && dataresults["nomsubregion"] !== '' && printsubregion) {
+                departamentos.push(dataresults["nomsubregion"]);
+                geograficas.push(dataresults["nomsubregion"]);
+                for (var l = 0; l < app.years.length; l++) {
+                  if (yearstoprint[l]) {
+                    
+                      rowdata.push(dataresults["yea" + app.years[l]]);
+                    
+                  }
+                }
+
+                serie["name"] = dataresults["nomsubregion"] + " " + thestring;
+                serie["data"] = rowdata;
+                theseries.push(serie);
+              }
+
+              //Verificación de municipios
+              else if (dataresults["nommpio"] !== null && dataresults["nommpio"] !== '' && printtown) {
+                printstate = false;
+                municipios.push(dataresults["nommpio"]);
+                geograficas.push(dataresults["nommpio"]);
+
+                for (var l = 0; l < app.years.length; l++) {
+                  if (yearstoprint[l]) {
+                    
+                      rowdata.push(dataresults["yea" + app.years[l]]);
+                    
+                  }
+                }
+
+                serie["name"] = dataresults["nommpio"] + " " + thestring;
+                serie["data"] = rowdata;
+                theseries.push(serie);
+              }
+
+              //Verificación de departamentos
+              else if (dataresults["nomdepto"] !== null && dataresults["nomdepto"] !== '' && printstate) {
+                departamentos.push(dataresults["nomdepto"]);
+                geograficas.push(dataresults["nomdepto"]);
+                for (var l = 0; l < app.years.length; l++) {
+                  if (yearstoprint[l]) {
+                    
+                      rowdata.push(dataresults["yea" + app.years[l]]);
+                                      }
+                }
+
+                serie["name"] = dataresults["nomdepto"] + " " + thestring;
+                serie["data"] = rowdata;
+                theseries.push(serie);
+              }
+
+              //Verificación de zonas
+              else if (dataresults["nomzona"] !== null && dataresults["nomzona"] !== '' && printzone) {
+                municipios.push(dataresults["nomzona"]);
+                geograficas.push(dataresults["nomzona"]);
+                console.log("Numero de años:" + app.years.length);
+                for (var l = 0; l < app.years.length; l++) {
+                  if (yearstoprint[l]) {
+                      rowdata.push(dataresults["yea" + app.years[l]]);
+                  }
+                }
+
+                serie["name"] = dataresults["nomzona"] + " " + thestring;
+                serie["data"] = rowdata;
+                theseries.push(serie);
+              }
+              else {
+                for (var l = 0; l < app.years.length; l++) {
+                  if (yearstoprint[l]) {
+                      rowdata.push(dataresults["yea" + app.years[l]]);
+                  }
+                }
+
+                serie["name"] = thelocation + " " + thestring;
+                serie["data"] = rowdata;
+                theseries.push(serie);
+              }
+
+
             }
-            aDataSet.push(aSingle);
+            cb(theseries, thecategories);
           }
 
-          var theaoColumns = [];
-          theaoColumns.push({
-            sTitle: "Ubicación Geográfica"
-          });
-          for (q = 0; q < thecategories.length; q++) {
-            var aoColumn = {};
-            aoColumn["sTitle"] = thecategories[q];
-            theaoColumns.push(aoColumn);
+          function dataset(theseries, thecategories) {
+            console.log("chart.table: dataset");
+            var aDataSet = [];
+
+            for (s = 0; s < theseries.length; s++) {
+              var aSingle = [];
+              aSingle.push(theseries[s].name);
+              for (t = 0; t < theseries[s].data.length; t++) {
+                aSingle.push(theseries[s].data[t]);
+              }
+              aDataSet.push(aSingle);
+            }
+
+            var theaoColumns = [];
+            theaoColumns.push({
+              sTitle: "Ubicación Geográfica"
+            });
+            for (q = 0; q < thecategories.length; q++) {
+              var aoColumn = {};
+              aoColumn["sTitle"] = thecategories[q];
+              theaoColumns.push(aoColumn);
+            }
+
+            app["colums"] = theaoColumns;
+            app["tabledata"] = aDataSet;
+            
+            app["dataTable"] = $('#dtable').dataTable({
+              "fnInitComplete": function(oSettings, json) {
+                $('#dtable').table();
+                app.hideLoadingBox();
+              },
+              "bFilter": false,
+              "bInfo": false,
+              "bPaginate": false,
+              "aaData": aDataSet,
+              "bDestroy": true,
+              "aoColumns": theaoColumns
+            });
           }
-
-          $('#dtable').dataTable({
-            "fnInitComplete": function(oSettings, json) {
-              $('#dtable').table();
-            },
-            "bDestroy": true,
-            "bFilter": false,
-            "bInfo": false,
-            "bPaginate": false,
-            aaData: aDataSet,
-            //aoColumns: thecategories
-            aoColumns: theaoColumns
-
-          });
         }
       }
     }
@@ -2352,7 +2467,8 @@ var app = {
     var progressBarWidth = percent * $element.width() / 100;
     $element.find('div').animate({
       width: progressBarWidth
-    }, 20).html(percent + "%&nbsp;");
+    }, 20);
+    $("#pbLabel").html(percent + "%&nbsp;");
   }
 };
 

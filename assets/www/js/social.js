@@ -8,8 +8,8 @@ Social.prototype.available = function(callback) {
 	}, null, "Social", "available", []);
 };
 
-Social.prototype.share = function(message, canvasId) {
-	var canvas = document.getElementById(canvasId);
+Social.prototype.share = function(message, canvas) {
+//	var canvas = document.getElementById(canvasId);
 	var imageData = canvas.toDataURL().replace(/data:image\/png;base64,/,'');
     cordova.exec(null, null, "Social", "share", [message, imageData]);
 };
