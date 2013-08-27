@@ -397,6 +397,10 @@ var app = {
   getTotal: function(cb) {
     var url = "http://servicedatosabiertoscolombia.cloudapp.net/v1/Ministerio_de_Salud/indicadoresdesalud/consecutivo?$top=1&$orderby=consecutivo%20desc&$format=json";
     var xhr = app.getJson2(url);
+    app.total = 0;
+    app.count = 0;
+    app.totalCount = 0;
+    app.totalCount2 = 1000;
     xhr.success(function(r) {
       app.totalCount = parseInt(r.d[0]["consecutivo"]);
       app.total = parseInt(r.d[0]["consecutivo"]);
@@ -1418,9 +1422,9 @@ var app = {
 
     lineal: function() {
 
-      if (app.selection.departamento.cols.iddepto.length > 0 && app.selection.departamento.cols.iddepto.indexOf("170") === -1) {
-        app.selection.departamento.cols.iddepto.push("170");
-      }
+      // if (app.selection.departamento.cols.iddepto.length > 0 && app.selection.departamento.cols.iddepto.indexOf("170") === -1) {
+      //   app.selection.departamento.cols.iddepto.push("170");
+      // }
 
       app.openDB(query);
 
@@ -1736,9 +1740,9 @@ var app = {
 
     bars: function() {
 
-      if (app.selection.departamento.cols.iddepto.length > 0 && app.selection.departamento.cols.iddepto.indexOf("170") === -1) {
-        app.selection.departamento.cols.iddepto.push("170");
-      }
+      // if (app.selection.departamento.cols.iddepto.length > 0 && app.selection.departamento.cols.iddepto.indexOf("170") === -1) {
+      //   app.selection.departamento.cols.iddepto.push("170");
+      // }
 
       app.openDB(query);
 
@@ -2193,9 +2197,9 @@ var app = {
 
     table: function() {
 
-      if (app.selection.departamento.cols.iddepto.length > 0 && app.selection.departamento.cols.iddepto.indexOf("170") === -1) {
-        app.selection.departamento.cols.iddepto.push("170");
-      }
+      // if (app.selection.departamento.cols.iddepto.length > 0 && app.selection.departamento.cols.iddepto.indexOf("170") === -1) {
+      //   app.selection.departamento.cols.iddepto.push("170");
+      // }
 
       if (typeof app.dataTable === "object") {
         app.dataTable.fnDestroy();
@@ -2288,11 +2292,9 @@ var app = {
                 geograficas.push(dataresults["nomregion"]);
                 for (var l = 0; l < app.years.length; l++) {
                   if (yearstoprint[l]) {
-                    if (dataresults["yea" + app.years[l]] !== '' && dataresults["yea" + app.years[l]] !== null && dataresults["yea" + app.years[l]] !== '-') {
-                      rowdata.push(parseFloat(dataresults["yea" + app.years[l]]));
-                    } else {
-                      rowdata.push(0.0);
-                    }
+                    
+                      rowdata.push(dataresults["yea" + app.years[l]]);
+                    
                   }
                 }
 
@@ -2308,11 +2310,9 @@ var app = {
                 geograficas.push(dataresults["nomsubregion"]);
                 for (var l = 0; l < app.years.length; l++) {
                   if (yearstoprint[l]) {
-                    if (dataresults["yea" + app.years[l]] !== '' && dataresults["yea" + app.years[l]] !== null && dataresults["yea" + app.years[l]] !== '-') {
-                      rowdata.push(parseFloat(dataresults["yea" + app.years[l]]));
-                    } else {
-                      rowdata.push(0.0);
-                    }
+                    
+                      rowdata.push(dataresults["yea" + app.years[l]]);
+                    
                   }
                 }
 
@@ -2329,11 +2329,9 @@ var app = {
 
                 for (var l = 0; l < app.years.length; l++) {
                   if (yearstoprint[l]) {
-                    if (dataresults["yea" + app.years[l]] !== '' && dataresults["yea" + app.years[l]] !== null && dataresults["yea" + app.years[l]] !== '-') {
-                      rowdata.push(parseFloat(dataresults["yea" + app.years[l]]));
-                    } else {
-                      rowdata.push(0.0);
-                    }
+                    
+                      rowdata.push(dataresults["yea" + app.years[l]]);
+                    
                   }
                 }
 
@@ -2348,12 +2346,9 @@ var app = {
                 geograficas.push(dataresults["nomdepto"]);
                 for (var l = 0; l < app.years.length; l++) {
                   if (yearstoprint[l]) {
-                    if (dataresults["yea" + app.years[l]] !== '' && dataresults["yea" + app.years[l]] !== null && dataresults["yea" + app.years[l]] !== '-') {
-                      rowdata.push(parseFloat(dataresults["yea" + app.years[l]]));
-                    } else {
-                      rowdata.push(0.0);
-                    }
-                  }
+                    
+                      rowdata.push(dataresults["yea" + app.years[l]]);
+                                      }
                 }
 
                 serie["name"] = dataresults["nomdepto"] + " " + thestring;
@@ -2368,25 +2363,18 @@ var app = {
                 console.log("Numero de años:" + app.years.length);
                 for (var l = 0; l < app.years.length; l++) {
                   if (yearstoprint[l]) {
-                    if (dataresults["yea" + app.years[l]] !== '' && dataresults["yea" + app.years[l]] !== null && dataresults["yea" + app.years[l]] !== '-') {
-                      rowdata.push(parseFloat(dataresults["yea" + app.years[l]]));
-                    } else {
-                      rowdata.push(0.0);
-                    }
+                      rowdata.push(dataresults["yea" + app.years[l]]);
                   }
                 }
 
                 serie["name"] = dataresults["nomzona"] + " " + thestring;
                 serie["data"] = rowdata;
                 theseries.push(serie);
-              } else {
+              }
+              else {
                 for (var l = 0; l < app.years.length; l++) {
                   if (yearstoprint[l]) {
-                    if (dataresults["yea" + app.years[l]] !== '' && dataresults["yea" + app.years[l]] !== null && dataresults["yea" + app.years[l]] !== '-') {
-                      rowdata.push(parseFloat(dataresults["yea" + app.years[l]]));
-                    } else {
-                      rowdata.push(0.0);
-                    }
+                      rowdata.push(dataresults["yea" + app.years[l]]);
                   }
                 }
 
