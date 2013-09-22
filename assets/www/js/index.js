@@ -387,7 +387,7 @@ var app = {
     console.log("startApp: Iniciando estructura de la applicación!");
     if (app.checkUpdatedData()) {
       setTimeout(function() {
-        $.mobile.changePage("#home");
+        $.mobile.changePage("#home"); //#home - #help-step1
       }, 4000);
     } else {
       app.getTotal(app.load);
@@ -528,7 +528,7 @@ var app = {
     if (app.start) {
       $.mobile.changePage("#help_step1");
     } else {
-      $.mobile.changePage("#home");
+      $.mobile.changePage("#home");//#home - #help_step1
     }
     
   },
