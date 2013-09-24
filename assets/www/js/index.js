@@ -132,7 +132,8 @@ var app = {
 
     app.buttonHeight();
     app.btnsEvents(app.sliderEvents);
-    app.pageEvents();
+    app.pageEvents();   
+
     $("#options").on("change", function(e) {
       $.mobile.changePage($(this).val());
     });
@@ -233,7 +234,7 @@ var app = {
         //app.openDB(app.chart[$this.data("graph")]);
       } else {
         navigator.notification.alert(
-          'Debe seleccionar una categoría de salud!', function() {
+          'Debe seleccionar un indicador de salud!', function() {
             $.mobile.changePage("#home");
           },
           'Atención',
@@ -276,6 +277,7 @@ var app = {
         if (v === "home") {
           $("select#options").prop('selectedIndex', 0).selectmenu("refresh");
         }
+        $(window).off('scroll');
         app.openDB(app.queryDB[v]);
       });
     });
@@ -556,7 +558,7 @@ var app = {
       app.years = [];
       tx.executeSql('SELECT DISTINCT columnName FROM columnNames WHERE columnName LIKE "yea%"', [], app.yea, app.errorCB);
 
-      tx.executeSql("SELECT DISTINCT iddepto, nomdepto FROM (" + app.buildSQL() + ") WHERE nomdepto <> ''  AND iddepto <> '170' AND iddepto <> '09' AND iddepto <> '75' AND iddepto <> '11' GROUP BY iddepto ORDER BY nomdepto", [], function(tx, results) {
+      tx.executeSql("SELECT DISTINCT iddepto, nomdepto FROM (" + app.buildSQL() + ") WHERE nomdepto <> ''  AND iddepto <> '170' AND iddepto <> '09' AND iddepto <> '75' GROUP BY iddepto ORDER BY nomdepto", [], function(tx, results) {
         app.counters["counter-dep"] = results.rows.length;
       }, app.errorCB);
 
@@ -566,6 +568,7 @@ var app = {
 
       function reg(tx, results) {
         app.counters["counter-reg"] = results.rows.item(0).counter;
+        console.log("COUNTER: >>>>>>>>>>>>>>>>>>>>>>>> " + results.rows.item(0).counter);
       }
 
       app.ent.indicador(tx, "SELECT DISTINCT idindicador, nomindicador FROM (" + app.buildSQL() + ") WHERE nomindicador <> '' GROUP BY idindicador ORDER BY nomindicador", function(tx) {
@@ -580,19 +583,28 @@ var app = {
       console.log("queryDB: Consultas!");
       app.showLoadingBox("Consultando!");
 
-      app.ent.pais(tx, "SELECT DISTINCT iddepto, nomdepto FROM (" + app.buildSQL() + ") WHERE nomdepto <> '' AND iddepto = '170' OR iddepto = '09' OR iddepto = '75' GROUP BY iddepto ORDER BY nomdepto", function(tx) {
-        app.ent.region(tx, "SELECT DISTINCT idregion, nomregion FROM (" + app.buildSQL() + ") WHERE nomregion <> '' GROUP BY idregion ORDER BY nomregion", function(tx) {
-          app.ent.subregion(tx, "SELECT DISTINCT idsubregion, nomsubregion FROM (" + app.buildSQL() + ") WHERE nomsubregion <> '' GROUP BY idsubregion ORDER BY nomsubregion", function(tx) {
-            app.ent.departamento(tx, "SELECT DISTINCT iddepto, nomdepto FROM (" + app.buildSQL() + ") WHERE nomdepto <> '' AND iddepto <> '170' AND iddepto <> '09' AND iddepto <> '75' GROUP BY iddepto ORDER BY nomdepto", function(tx) {
-              app.ent.municipio(tx, "SELECT DISTINCT idmpio, nommpio FROM (" + app.buildSQL() + ") WHERE nommpio <> '' GROUP BY idmpio ORDER BY nommpio LIMIT 25", function(tx) {
-                app.ent.zona(tx, "SELECT DISTINCT idzona, nomzona FROM (" + app.buildSQL() + ") WHERE nomzona <> '' GROUP BY idzona ORDER BY nomzona", function(tx) {
-                  app.hideLoadingBox();
-                });
-              });
-            });
-          });
-        });
-      });
+      app.ent.pais(tx, "SELECT DISTINCT iddepto, nomdepto FROM (" + app.buildSQL() + ") WHERE nomdepto <> '' AND iddepto = '170' OR iddepto = '09' OR iddepto = '75' GROUP BY iddepto ORDER BY nomdepto");
+      app.ent.region(tx, "SELECT DISTINCT idregion, nomregion FROM (" + app.buildSQL() + ") WHERE nomregion <> '' GROUP BY idregion ORDER BY nomregion");
+      app.ent.subregion(tx, "SELECT DISTINCT idsubregion, nomsubregion FROM (" + app.buildSQL() + ") WHERE nomsubregion <> '' GROUP BY idsubregion ORDER BY nomsubregion");
+      app.ent.departamento(tx, "SELECT DISTINCT iddepto, nomdepto FROM (" + app.buildSQL() + ") WHERE nomdepto <> '' AND iddepto <> '170' AND iddepto <> '09' AND iddepto <> '75' GROUP BY iddepto ORDER BY nomdepto");
+      app.ent.municipio(tx, "SELECT DISTINCT idmpio, nommpio FROM (" + app.buildSQL() + ") WHERE nommpio <> '' GROUP BY idmpio ORDER BY nommpio");
+      app.ent.zona(tx, "SELECT DISTINCT idzona, nomzona FROM (" + app.buildSQL() + ") WHERE nomzona <> '' GROUP BY idzona ORDER BY nomzona");
+
+      app.hideLoadingBox();
+
+      // app.ent.pais(tx, "SELECT DISTINCT iddepto, nomdepto FROM (" + app.buildSQL() + ") WHERE nomdepto <> '' AND iddepto = '170' OR iddepto = '09' OR iddepto = '75' GROUP BY iddepto ORDER BY nomdepto", function(tx) {
+      //   app.ent.region(tx, "SELECT DISTINCT idregion, nomregion FROM (" + app.buildSQL() + ") WHERE nomregion <> '' GROUP BY idregion ORDER BY nomregion", function(tx) {
+      //     app.ent.subregion(tx, "SELECT DISTINCT idsubregion, nomsubregion FROM (" + app.buildSQL() + ") WHERE nomsubregion <> '' GROUP BY idsubregion ORDER BY nomsubregion", function(tx) {
+      //       app.ent.departamento(tx, "SELECT DISTINCT iddepto, nomdepto FROM (" + app.buildSQL() + ") WHERE nomdepto <> '' AND iddepto <> '170' AND iddepto <> '09' AND iddepto <> '75' GROUP BY iddepto ORDER BY nomdepto", function(tx) {
+      //         app.ent.municipio(tx, "SELECT DISTINCT idmpio, nommpio FROM (" + app.buildSQL() + ") WHERE nommpio <> '' GROUP BY idmpio ORDER BY nommpio", function(tx) {
+      //           app.ent.zona(tx, "SELECT DISTINCT idzona, nomzona FROM (" + app.buildSQL() + ") WHERE nomzona <> '' GROUP BY idzona ORDER BY nomzona", function(tx) {
+      //             app.hideLoadingBox();
+      //           });
+      //         });
+      //       });
+      //     });
+      //   });
+      // });
     },
     demografia: function(tx) {
 
@@ -762,7 +774,7 @@ var app = {
       }
     },
 
-    pais: function(tx, sql, cb) {
+    pais: function(tx, sql) {
 
       console.log("ent.region: Construye paises!");
 
@@ -791,11 +803,11 @@ var app = {
         }
         $(list).html(html).trigger('create');
         app.registerInputs(list, "checkbox");
-        cb(tx);
+        
       }
     },
 
-    region: function(tx, sql, cb) {
+    region: function(tx, sql) {
 
       console.log("ent.region: Construye regiones!");
 
@@ -824,11 +836,11 @@ var app = {
         }
         $(list).html(html).trigger('create');
         app.registerInputs(list, "checkbox");
-        cb(tx);
+        
       }
     },
 
-    subregion: function(tx, sql, cb) {
+    subregion: function(tx, sql) {
 
       console.log("ent.subregion: Construye subregiones!");
 
@@ -855,11 +867,13 @@ var app = {
         }
         $(list).html(html).trigger('create');
         app.registerInputs(list, "checkbox");
-        cb(tx);
+        
       }
     },
 
-    departamento: function(tx, sql, cb) {
+    departamento: function(tx, sql) {
+
+      app["scroll"] = false;
 
       console.log("ent.departamento: Construye departamentos!");
 
@@ -886,15 +900,14 @@ var app = {
           html += '<label for="departamento-' + results.rows.item(i).iddepto + '">' + results.rows.item(i).nomdepto + '</label>';
         }
         $(list).html(html).trigger('create');
-        app.registerInputs(list, "checkbox");
-        cb(tx);
+        app.registerInputs(list, "checkbox");        
       }
 
     },
 
-    municipio: function(tx, sql, cb) {
+    municipio: function(tx, sql) {
 
-      console.log("ent.municipio: Construye municipios!");
+      console.log("ent.municipio: Construye municipios!");      
 
       tx.executeSql(sql, [], municipio, app.errorCB);
 
@@ -914,18 +927,48 @@ var app = {
         }
         $("#municipioCount").html(len);
 
-        for (var i = 0; i < len; i++) {
-          html += '<input type="checkbox" data-vista="municipio" data-col="idmpio" name="municipio-' + results.rows.item(i).idmpio + '" id="municipio-' + results.rows.item(i).idmpio + '" value="' + results.rows.item(i).idmpio + '"/> \n';
-          html += '<label for="municipio-' + results.rows.item(i).idmpio + '">' + results.rows.item(i).nommpio + '</label> \n';
+        if (len > 100) {
+          var h = $(window).height();
+          var unit = h / 30;
+          var init = 0;
+          draw(init, unit);
+
+          $(window).on("scroll", function(e) {
+            console.log(len);
+            var st = $(this).scrollTop();
+            if (unit <= len) {
+              if (st >= h / 2) {
+                h += $(window).height();
+                draw(init, unit);
+              }
+            }
+          });
+
+          function draw(a, b) {
+            for (var i = parseInt(a, 10); i < parseInt(b, 10); i++) {
+              html += '<input type="checkbox" data-vista="municipio" data-col="idmpio" name="municipio-' + results.rows.item(i).idmpio + '" id="municipio-' + results.rows.item(i).idmpio + '" value="' + results.rows.item(i).idmpio + '"/> \n';
+              html += '<label for="municipio-' + results.rows.item(i).idmpio + '">' + results.rows.item(i).nommpio + '</label> \n';
+            }
+            init = b;
+            unit += $(window).height() / 30;
+            $(list).html(html).trigger('create');
+            app.registerInputs(list, "checkbox");
+          }
+        } else {
+          $(window).off('scroll');
+          for (var i = 0; i < len; i++) {
+            html += '<input type="checkbox" data-vista="municipio" data-col="idmpio" name="municipio-' + results.rows.item(i).idmpio + '" id="municipio-' + results.rows.item(i).idmpio + '" value="' + results.rows.item(i).idmpio + '"/> \n';
+            html += '<label for="municipio-' + results.rows.item(i).idmpio + '">' + results.rows.item(i).nommpio + '</label> \n';
+          }
+          $(list).html(html).trigger('create');
+          app.registerInputs(list, "checkbox");  
         }
-        $(list).html(html).trigger('create');
-        app.registerInputs(list, "checkbox");
-        cb(tx);
+        
       }
 
     },
 
-    zona: function(tx, sql, cb) {
+    zona: function(tx, sql) {
 
       console.log("ent.zona: Construye zonas!");
 
@@ -952,7 +995,7 @@ var app = {
         }
         $(list).html(html).trigger('create');
         app.registerInputs(list, "checkbox");
-        cb(tx);
+        
       }
 
     },
@@ -2166,14 +2209,14 @@ var app = {
           var options = {
             legend: 'none',
             region: 'CO',
-            resolution: 'provinces',
-            displayMode: 'regions',
+            //resolution: 'provinces',
+            displayMode: 'markers',
             height: app.homeheight - 150,
             width: $(document).width(),
-            // magnifyingGlass: {
-            //   enable: "true",
-            //   zoomFactor: "10.0"
-            // },
+             magnifyingGlass: {
+               enable: "true",
+               zoomFactor: "10.0"
+             },
             backgroundColor: {
               fill: "transparent"
             },
