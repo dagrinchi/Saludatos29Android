@@ -111,10 +111,8 @@ body {
 }
 
 /*========================================== END ANDROID DEVICES ====================================*/
-
-/*****Start Media screen types******/
-/*iPhone < 5:*/
-@media screen and (device-aspect-ratio: 2/3) {
+/* Smartphones (portrait) ----------- */
+@media only screen  and (max-width : 320px) {
 	.animation-size-for-iframe {
 		width: 330px;
 		height: 355px;
@@ -122,25 +120,123 @@ body {
 	}
 
 	#counter-reg, #counter-dep, #counter-mun {
-		font-size: 2.4em;
+		font-size: 1.4em;
 		color: #ccc;
 	}
 }
-/*iPhone 5:*/
-@media screen and (device-aspect-ratio: 40/71) {
+
+/* Smartphones (portrait and landscape) ----------- */
+@media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
 	.animation-size-for-iframe {
-	width: 330px;
-	height: 355px;
-	margin: 0px 60% 0px 0px !important;
+		width: 330px;
+		height: 355px;
+		margin: 0px 60% 0px 0px !important;
 	}
 
 	#counter-reg, #counter-dep, #counter-mun {
-		font-size: 3.5em;
+		font-size: 1.8em;
 		color: #ccc;
 	}
 }
-/*iPad:*/
-@media screen and (device-aspect-ratio: 3/4) {
+
+/* Smartphones (landscape) ----------- */
+@media only screen and (min-width : 321px) {
+	.animation-size-for-iframe {
+		width: 330px;
+		height: 355px;
+		margin: 0px 60% 0px 0px !important;
+	}
+
+	#counter-reg, #counter-dep, #counter-mun {
+		font-size: 3em;
+		color: #ccc;
+	}
+}
+
+@media only screen and (min-width : 570px) {
+	.animation-size-for-iframe {
+		width: 330px;
+		height: 355px;
+		margin: 0px 60% 0px 0px !important;
+	}
+
+	#counter-reg, #counter-dep, #counter-mun {
+		font-size: 5em;
+		color: #ccc;
+	}
+}
+
+/* iPads (portrait and landscape) ----------- */
+@media only screen and (min-device-width : 768px) and (max-device-width : 1024px) {
+	.animation-size-for-iframe {
+	width: 330px;
+	height: 355px;
+	margin: 0px 33.3% 0px 28.3% !important;
+	}
+
+	#counter-reg, #counter-dep, #counter-mun {
+		font-size: 4.5em;
+		color: #ccc;
+	}
+}
+
+/* iPads (landscape) ----------- */
+@media only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (orientation : landscape) {
+	.animation-size-for-iframe {
+	width: 330px;
+	height: 355px;
+	margin: 0px 33.3% 0px 28.3% !important;
+	}
+
+	#counter-reg, #counter-dep, #counter-mun {
+		font-size: 4.5em;
+		color: #ccc;
+	}
+}
+
+/* iPads (portrait) ----------- */
+@media only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (orientation : portrait) {
+	.animation-size-for-iframe {
+	width: 330px;
+	height: 355px;
+	margin: 0px 33.3% 0px 28.3% !important;
+	}
+
+	#counter-reg, #counter-dep, #counter-mun {
+		font-size: 4.5em;
+		color: #ccc;
+	}
+}
+
+/* The New iPad (iPad 3) ----------- */
+@media only screen and (min-device-width: 1536px) and (max-device-width: 2048px) and (-webkit-min-device-pixel-ratio: 2) {
+	.animation-size-for-iframe {
+	width: 330px;
+	height: 355px;
+	margin: 0px 33.3% 0px 28.3% !important;
+	}
+
+	#counter-reg, #counter-dep, #counter-mun {
+		font-size: 4.5em;
+		color: #ccc;
+	}
+}
+
+/* iPhone 4 ----------- */
+@media only screen and (-webkit-min-device-pixel-ratio : 1.5), only screen and (min-device-pixel-ratio : 1.5) {
+	.animation-size-for-iframe {
+	width: 330px;
+	height: 355px;
+	margin: 0px 33.3% 0px 28.3% !important;
+	}
+
+	#counter-reg, #counter-dep, #counter-mun {
+		font-size: 4.5em;
+		color: #ccc;
+	}
+}
+
+@media only screen and (-webkit-min-device-pixel-ratio : 2), only screen and (min-device-pixel-ratio : 2) {
 	.animation-size-for-iframe {
 	width: 330px;
 	height: 355px;
