@@ -52,7 +52,7 @@ public class Social extends CordovaPlugin {
 		try {
 			Intent sendIntent = new Intent(android.content.Intent.ACTION_SEND);
 			sendIntent.setType("image/jpeg");
-			sendIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Saludatos - Estadísticas de Salud");
+			sendIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Saludatos - Estad√≠sticas de Salud");
 			sendIntent.putExtra(android.content.Intent.EXTRA_TEXT, message);
 			sendIntent.putExtra(android.content.Intent.EXTRA_STREAM, Uri.fromFile(imageFile));
 			this.cordova.startActivityForResult(this, sendIntent, 0);
