@@ -133,6 +133,7 @@ var app = {
     app.buttonHeight();
     app.btnsEvents(app.sliderEvents);
     app.pageEvents();   
+    app.chartSize();
 
     $("#options").on("change", function(e) {
       $.mobile.changePage($(this).val());
@@ -152,11 +153,17 @@ var app = {
     console.log('Received Event: ' + id);
   },
 
-  chartHeight: function() {
-    var charts = ["#linealchartdiv", "#piechartdiv", "#columnchartdiv", "#geochartdiv"];
+  chartSize: function() {
+    var charts = ["#linealchartdiv", "#piechartdiv", "#columnchartdiv"];
+    var ww = $(window).width();
+    var wh = $(window).height();
     $.each(charts, function(k, v) {
-      $($(v).parents()[1]).width();
+      //$(v).width($($(v).parents()[1]).width());
+      $(v).width(ww);
+      $(v).height(wh - 106);
     });
+    $("#geochartdiv").width(ww);
+    $("#geochartdiv").height(ww);
   },
 
   buttonHeight: function() {
@@ -171,6 +178,17 @@ var app = {
   btnsEvents: function(cb) {
 
     console.log("btnsEvents: Asignando eventos a los botones de las gráficas!");
+
+    $("#inczoom").on("click", function() {
+        app["mapopt"].width = app["mapopt"].width * 2;
+        app["mapopt"].height = app["mapopt"].height * 2;
+        app["mapobj"].draw(app["mapdata"], app["mapopt"]);
+    });
+    $("#deczoom").on("click", function() {
+        app["mapopt"].width = app["mapopt"].width / 2;
+        app["mapopt"].height = app["mapopt"].height / 2;
+        app["mapobj"].draw(app["mapdata"], app["mapopt"]);
+    });
 
     $("#update").on("click", function() {
       app.start = false;
@@ -1770,7 +1788,7 @@ var app = {
               align: "center",
               verticalAlign: "top",
               borderWidth: 1,
-              margin: 5,
+              //margin: 5,
               x: 15,
             },
             series: theseries
@@ -2075,7 +2093,7 @@ var app = {
               align: "center",
               verticalAlign: "top",
               borderWidth: 0,
-              margin: 5,
+              //margin: 5,
               x: 10
             },
             title: {
@@ -2219,17 +2237,18 @@ var app = {
           app["mapobj"] = new google.visualization.GeoChart(document.getElementById('geochartdiv'));
           app["mapopt"] = {
             sizeAxis: { 
-              minSize : 10
+              minSize : 18
             },
             legend: 'none',
             region: 'CO',
             resolution: 'provinces',
             displayMode: 'markers',
-            height: app.homeheight - 150,
-            width: $(document).width(),
+            height: $(window).width(),
+            width: $(window).width(),
+            //keepAspectRatio: false,
              magnifyingGlass: {
                enable: "true",
-               zoomFactor: "10.0"
+               zoomFactor: "20.0"
              },
             backgroundColor: {
               fill: "transparent"
@@ -2402,16 +2421,20 @@ var app = {
               else if (dataresults["nomdepto"] !== null && dataresults["nomdepto"] !== '' && printstate) {
                 departamentos.push(dataresults["nomdepto"]);
                 geograficas.push(dataresults["nomdepto"]);
+
                 for (var l = 0; l < app.years.length; l++) {
-                  if (yearstoprint[l]) {
-                    
-                      rowdata.push(dataresults["yea" + app.years[l]]);
-                                      }
-                }
+                  if (yearstoprint[l]) {                    
+                      rowdata.push(dataresults["yea" + app.years[l]]);                                      }
+                }                
 
                 serie["name"] = dataresults["nomdepto"] + " " + thestring;
                 serie["data"] = rowdata;
-                theseries.push(serie);
+                
+                if (dataresults["iddepto"] === "170") {
+                  theseries.unshift(serie);
+                } else {
+                  theseries.push(serie);
+                }
               }
 
               //Verificación de zonas
@@ -2461,6 +2484,7 @@ var app = {
 
             var theaoColumns = [];
             theaoColumns.push({
+              "bSortable": false,
               sTitle: "Ubicación Geográfica"
             });
             for (q = 0; q < thecategories.length; q++) {
@@ -2482,7 +2506,8 @@ var app = {
               "bPaginate": false,
               "aaData": aDataSet,
               "bDestroy": true,
-              "aoColumns": theaoColumns
+              "aoColumns": theaoColumns,
+              "aaSorting": [],
             });
           }
         }
